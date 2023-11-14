@@ -1,0 +1,10 @@
+(env
+ (static
+  (flags
+   (:standard -ccopt -static))))
+
+(executable
+ (package ppx_rhf)
+ (name bin)
+ (public_name ppx_rhf)
+ (libraries ppx_rhf))

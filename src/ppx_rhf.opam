@@ -1,0 +1,21 @@
+opam-version: "2.0"
+name: "ppx_rhf"
+version: "0.0.1"
+synopsis: "ReScript PPX for react-hook-form"
+description: """
+ReScript PPX which generates the bindings for react-hook-form
+"""
+maintainer: "Greenlabs Dev <woonki.moon@gmail.com>"
+authors: "Greenlabs Dev <woonki.moon@gmail.com>"
+license: "MIT"
+homepage: "https://gitlab.com/mununki/ppx-react-hook-form"
+bug-reports: "https://gitlab.com/mununki/ppx-react-hook-form/-/issues"
+dev-repo: "git+https://gitlab.com/mununki/ppx-react-hook-form.git"
+depends: [
+  "ocaml" { = "4.14.0"}
+  "dune" { >= "2.7"}
+  "ppxlib" { = "0.24.0"}
+]
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]

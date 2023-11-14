@@ -1,0 +1,19 @@
+{
+  "name": "ppx-rhf-test",
+  "packageManager": "pnpm@8.8.0",
+  "version": "0.0.1",
+  "description": "Test ppx-rhf",
+  "license": "MIT",
+  "devDependencies": {
+    "@glennsl/rescript-jest": "^0.10.0",
+    "jest": "^27.3.1",
+    "rescript": "^11.0.0-rc.5"
+  },
+  "scripts": {
+    "res:build": "rescript",
+    "res:clean": "rescript clean",
+    "res:watch": "rescript build -w",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  }
+}
