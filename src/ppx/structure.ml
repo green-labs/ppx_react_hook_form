@@ -18,8 +18,8 @@ let map_type_decl
         let type_decls =
           Str.type_ Recursive
             [
-              (* type useFormReturnOfInputs = {
-                   register: (variantOfInputs, ~options: registerOptionsOfInputs=?) => JsxDOM.domProps,
+              (* type useFormReturnOfInputs<'setValueAs> = {
+                   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
                    handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
                    watch: variantOfInputs => watchReturnOfInputs,
                    formState: formStateOfInputs,
@@ -28,6 +28,7 @@ let map_type_decl
                 (mkloc
                    ("useFormReturnOf" ^ String.capitalize_ascii txt)
                    ptype_loc)
+                ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -51,7 +52,7 @@ let map_type_decl
                                         ]
                                       (lid @@ "registerOptionsOf"
                                       ^ String.capitalize_ascii txt)
-                                      [])
+                                      [ Typ.var "setValueAs" ])
                                    (Typ.constr
                                       (mknoloc
                                          (Longident.Ldot
@@ -107,20 +108,24 @@ let map_type_decl
                 (mkloc ("variantOf" ^ String.capitalize_ascii txt) ptype_loc)
                 ~priv:Public
                 ~kind:(Ptype_variant (make_const_decls fields ptype_loc));
-              (* type registerOptionsOfInputs = {required?: bool} *)
+              (* type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs: 'setValueAs} *)
               Type.mk
                 (mkloc
                    ("registerOptionsOf" ^ String.capitalize_ascii txt)
                    ptype_loc)
+                ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
                 ~priv:Public
                 ~kind:
                   (Ptype_record
                      [
-                       Type.field ~mut:Immutable (mknoloc "required")
-                         (Typ.constr
-                            ~attrs:
-                              [ Attr.mk (mknoloc "res.optional") (PStr []) ]
-                            (lid "bool") []);
+                       Type.field
+                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
+                         ~mut:Immutable (mknoloc "required")
+                         (Typ.constr (lid "bool") []);
+                       Type.field
+                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
+                         ~mut:Immutable (mknoloc "setValueAs")
+                         (Typ.var "setValueAs");
                      ]);
               (* @unboxed type watchReturnOfInputs = String(string) | Number(float) *)
               Type.mk
@@ -162,14 +167,52 @@ let map_type_decl
                      |> List.map (fun (ld : label_declaration) ->
                             {
                               ld with
-                              pld_type = Typ.constr (lid "bool") [];
+                              pld_type =
+                                Typ.constr
+                                  (lid @@ "fieldErrorOf"
+                                  ^ String.capitalize_ascii txt)
+                                  [];
                               pld_attributes =
-                                remove_optional_attribute ld.pld_attributes;
+                                add_optional_attribute ld.pld_attributes;
                             })));
+              (* type fieldErrorOfInputs = {message?: string} *)
+              Type.mk
+                (mkloc ("fieldErrorOf" ^ String.capitalize_ascii txt) ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     [
+                       Type.field
+                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
+                         ~mut:Immutable (mknoloc "message")
+                         (Typ.constr (lid "string") []);
+                     ]);
+              (* type useFormParamsOfInputs<'resolver> = {
+                   resolver?: 'resolver,
+                   defaultValues?: inputs,
+                 } *)
+              Type.mk
+                (mkloc
+                   ("useFormParamsOf" ^ String.capitalize_ascii txt)
+                   ptype_loc)
+                ~params:[ (Typ.var "resolver", (NoVariance, NoInjectivity)) ]
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     [
+                       Type.field
+                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
+                         ~mut:Immutable (mknoloc "resolver")
+                         (Typ.var "resolver");
+                       Type.field
+                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
+                         ~mut:Immutable (mknoloc "defaultValues")
+                         (Typ.constr (lid txt) []);
+                     ]);
             ]
         in
         (* @module("react-hook-form")
-           external useFormOfInputs: unit => useFormReturnOfInputs = "useForm" *)
+           external useFormOfInputs: (~options: useFormParamsOfInputs<'resolver>=?) => useFormReturnOfInputs = "useForm" *)
         let primitive_use_form =
           Str.primitive
             (Val.mk
@@ -186,11 +229,15 @@ let map_type_decl
                (mknoloc @@ "useFormOf" ^ String.capitalize_ascii txt)
                (uncurried_core_type_arrow ~arity:1
                   [
-                    Typ.arrow Nolabel
-                      (Typ.constr (lid "unit") [])
+                    Typ.arrow (Optional "options")
+                      (Typ.constr
+                         ~attrs:
+                           [ Attr.mk (mknoloc "res.namedArgLoc") (PStr []) ]
+                         (lid @@ "useFormParamsOf" ^ String.capitalize_ascii txt)
+                         [ Typ.var "resolver" ])
                       (Typ.constr
                          (lid @@ "useFormReturnOf" ^ String.capitalize_ascii txt)
-                         []);
+                         [ Typ.var "setValueAs" ]);
                   ]))
         in
         [ type_decls; primitive_use_form ]

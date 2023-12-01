@@ -28,6 +28,9 @@ let remove_optional_attribute (attrs : attributes) : attributes =
       txt <> "res.optional")
     attrs
 
+let add_optional_attribute (attrs : attributes) : attributes =
+  Attr.mk (mknoloc "res.optional") (PStr []) :: remove_optional_attribute attrs
+
 let uncurried_core_type_arrow ?loc ?attrs ~arity core_types =
   Typ.constr ?loc ?attrs (lid "function$")
     (core_types
