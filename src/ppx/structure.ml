@@ -155,7 +155,7 @@ let map_type_decl
                             ^ String.capitalize_ascii txt)
                             []);
                      ]);
-              (* type fieldErrorsOfInputs = { example: bool, exampleRequired: bool } *)
+              (* type fieldErrorsOfInputs = { example: fieldErrorOfInputs, exampleRequired: fieldErrorOfInputs } *)
               Type.mk
                 (mkloc
                    ("fieldErrorsOf" ^ String.capitalize_ascii txt)
