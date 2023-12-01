@@ -19,11 +19,12 @@ let map_type_decl
           Str.type_ Recursive
             [
               (* type useFormReturnOfInputs<'setValueAs> = {
-                   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
-                   handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
-                   watch: variantOfInputs => watchReturnOfInputs,
-                   formState: formStateOfInputs,
-                 } *)
+                  control: controlOfInputs,
+                  register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
+                  handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
+                  watch: variantOfInputs => watchReturnOfInputs,
+                  formState: formStateOfInputs,
+                    } *)
               Type.mk
                 (mkloc
                    ("useFormReturnOf" ^ String.capitalize_ascii txt)
@@ -33,6 +34,11 @@ let map_type_decl
                 ~kind:
                   (Ptype_record
                      [
+                       (* control: controlOfInputs *)
+                       Type.field ~mut:Immutable (mknoloc "control")
+                         (Typ.constr
+                            (lid @@ "controlOf" ^ String.capitalize_ascii txt)
+                            []);
                        (* register: (variantOfInputs, ~options: registerOptionsOfInputs=?) => JsxDOM.domProps, *)
                        Type.field ~mut:Immutable (mknoloc "register")
                          (uncurried_core_type_arrow ~arity:2
@@ -103,6 +109,10 @@ let map_type_decl
                             (lid @@ "formStateOf" ^ String.capitalize_ascii txt)
                             []);
                      ]);
+              (* type controlOfInputs *)
+              Type.mk
+                (mkloc ("controlOf" ^ String.capitalize_ascii txt) ptype_loc)
+                ~priv:Public ~kind:Ptype_abstract;
               (* type variantOfinputs = | @as("example") Example | @as("exampleRequired") ExampleRequired *)
               Type.mk
                 (mkloc ("variantOf" ^ String.capitalize_ascii txt) ptype_loc)
@@ -240,7 +250,147 @@ let map_type_decl
                          [ Typ.var "setValueAs" ]);
                   ]))
         in
-        [ type_decls; primitive_use_form ]
+        (* module Controller = {
+             type controllerRulesOfInputs = {required?: bool}
+             type controllerFieldsOfInputs = {field: JsxDOM.domProps}
+
+             @module("react-hook-form") @react.component
+             external make: (
+               ~name: variantOfInputs=?,
+               ~control: controlOfInputs=?,
+               ~rules: controllerRulesOfInputs,
+               ~render: controllerFieldsOfInputs => React.element=?,
+             ) => React.element = "Controller"
+           } *)
+        let module_controller =
+          Str.module_
+            (Mb.mk
+               (mknoloc @@ Some "Controller")
+               (Mod.structure
+                  [
+                    Str.type_ Recursive
+                      [
+                        (* type controllerRulesOfInputs = {required?: bool} *)
+                        Type.mk
+                          (mknoloc
+                             ("controllerRulesOf" ^ String.capitalize_ascii txt))
+                          ~priv:Public
+                          ~kind:
+                            (Ptype_record
+                               [
+                                 Type.field
+                                   ~attrs:
+                                     [
+                                       Attr.mk (mknoloc "res.optional")
+                                         (PStr []);
+                                     ]
+                                   (mknoloc "required")
+                                   (Typ.constr (lid "bool") []);
+                               ]);
+                        (* type controllerFieldsOfInputs = {field: JsxDOM.domProps} *)
+                        Type.mk
+                          (mknoloc
+                             ("controllerFieldsOf" ^ String.capitalize_ascii txt))
+                          ~priv:Public
+                          ~kind:
+                            (Ptype_record
+                               [
+                                 Type.field (mknoloc "field")
+                                   (Typ.constr
+                                      (mknoloc
+                                         (Longident.Ldot
+                                            (Lident "JsxDOM", "domProps")))
+                                      []);
+                               ]);
+                      ];
+                    (* @module("react-hook-form") @react.component
+                       external make: (
+                         ~name: variantOfInputs=?,
+                         ~control: controlOfInputs=?,
+                         ~rules: controllerRulesOfInputs,
+                         ~render: controllerFieldsOfInputs => React.element=?,
+                       ) => React.element = "Controller" *)
+                    Str.primitive
+                      (Val.mk
+                         ~attrs:
+                           [
+                             Attr.mk (mknoloc "module")
+                               (PStr
+                                  [
+                                    Str.eval
+                                    @@ Exp.constant
+                                         (Const.string "react-hook-form");
+                                  ]);
+                             Attr.mk (mknoloc "react.component") (PStr []);
+                           ]
+                         ~prim:[ "Controller" ] (mknoloc "make")
+                         (uncurried_core_type_arrow ~arity:4
+                            [
+                              Typ.arrow (Labelled "name")
+                                (Typ.constr
+                                   ~attrs:
+                                     [
+                                       Attr.mk
+                                         (mknoloc "res.namedArgLoc")
+                                         (PStr []);
+                                     ]
+                                   (lid @@ "variantOf"
+                                   ^ String.capitalize_ascii txt)
+                                   [])
+                                (Typ.arrow (Labelled "control")
+                                   (Typ.constr
+                                      ~attrs:
+                                        [
+                                          Attr.mk
+                                            (mknoloc "res.namedArgLoc")
+                                            (PStr []);
+                                        ]
+                                      (lid @@ "controlOf"
+                                      ^ String.capitalize_ascii txt)
+                                      [])
+                                   (Typ.arrow (Labelled "rules")
+                                      (Typ.constr
+                                         ~attrs:
+                                           [
+                                             Attr.mk
+                                               (mknoloc "res.namedArgLoc")
+                                               (PStr []);
+                                           ]
+                                         (lid @@ "controllerRulesOf"
+                                         ^ String.capitalize_ascii txt)
+                                         [])
+                                      (Typ.arrow (Labelled "render")
+                                         (uncurried_core_type_arrow
+                                            ~attrs:
+                                              [
+                                                Attr.mk
+                                                  (mknoloc "res.namedArgLoc")
+                                                  (PStr []);
+                                              ]
+                                            ~arity:1
+                                            [
+                                              Typ.arrow Nolabel
+                                                (Typ.constr
+                                                   (lid @@ "controllerFieldsOf"
+                                                   ^ String.capitalize_ascii txt
+                                                   )
+                                                   [])
+                                                (Typ.constr
+                                                   (mknoloc
+                                                      (Longident.Ldot
+                                                         ( Lident "React",
+                                                           "element" )))
+                                                   []);
+                                            ])
+                                         (Typ.constr
+                                            (mknoloc
+                                               (Longident.Ldot
+                                                  (Lident "React", "element")))
+                                            []))));
+                            ]));
+                  ]))
+        in
+        [ type_decls; primitive_use_form; module_controller ]
     | _ -> fail ptype_loc "This type is not handled by @ppx_ts.keyOf"
   else []
 
