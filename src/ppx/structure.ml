@@ -250,7 +250,7 @@ let map_type_decl
                          [ Typ.var "setValueAs" ]);
                   ]))
         in
-        (* module Controller = {
+        (* module ControllerOfInputs = {
              type controllerRulesOfInputs = {required?: bool}
              type controllerFieldsOfInputs = {field: JsxDOM.domProps}
 
@@ -265,7 +265,7 @@ let map_type_decl
         let module_controller =
           Str.module_
             (Mb.mk
-               (mknoloc @@ Some "Controller")
+               (mknoloc @@ Some ("ControllerOf" ^ String.capitalize_ascii txt))
                (Mod.structure
                   [
                     Str.type_ Recursive
