@@ -39,3 +39,10 @@ let uncurried_core_type_arrow ?loc ?attrs ~arity core_types =
           [ Rf.tag (mknoloc @@ "Has_arity" ^ Int.to_string arity) true [] ]
           Closed None;
       ])
+
+let uncurried_expr_func ?(loc = Location.none) ~arity e =
+  let attr_arity =
+    Attr.mk { txt = "res.arity"; loc }
+      (PStr [ Str.eval (Exp.constant (Const.int arity)) ])
+  in
+  Exp.construct ~attrs:[ attr_arity ] { txt = Lident "Function$"; loc } (Some e)

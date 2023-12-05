@@ -118,7 +118,7 @@ let map_type_decl
                 (mkloc ("variantOf" ^ String.capitalize_ascii txt) ptype_loc)
                 ~priv:Public
                 ~kind:(Ptype_variant (make_const_decls fields ptype_loc));
-              (* type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs: 'setValueAs} *)
+              (* type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs?: 'setValueAs} *)
               Type.mk
                 (mkloc
                    ("registerOptionsOf" ^ String.capitalize_ascii txt)
@@ -174,17 +174,45 @@ let map_type_decl
                 ~kind:
                   (Ptype_record
                      (lds
-                     |> List.map (fun (ld : label_declaration) ->
-                            {
-                              ld with
-                              pld_type =
-                                Typ.constr
-                                  (lid @@ "fieldErrorOf"
-                                  ^ String.capitalize_ascii txt)
-                                  [];
-                              pld_attributes =
-                                add_optional_attribute ld.pld_attributes;
-                            })));
+                     |> List.map
+                          (fun (({ pld_type } : label_declaration) as ld) ->
+                            match pld_type with
+                            (* type fieldErrorsOfInputs = {cart?: array<fieldErrorsOfItem>} *)
+                            | {
+                             ptyp_desc =
+                               Ptyp_constr
+                                 ( { txt = Lident "array" },
+                                   [
+                                     {
+                                       ptyp_desc =
+                                         Ptyp_constr ({ txt = Lident l }, []);
+                                     };
+                                   ] );
+                            } ->
+                                {
+                                  ld with
+                                  pld_type =
+                                    Typ.constr (lid "array")
+                                      [
+                                        Typ.constr
+                                          (lid @@ "fieldErrorsOf"
+                                         ^ String.capitalize_ascii l)
+                                          [];
+                                      ];
+                                  pld_attributes =
+                                    add_optional_attribute ld.pld_attributes;
+                                }
+                            | _ ->
+                                {
+                                  ld with
+                                  pld_type =
+                                    Typ.constr
+                                      (lid @@ "fieldErrorOf"
+                                      ^ String.capitalize_ascii txt)
+                                      [];
+                                  pld_attributes =
+                                    add_optional_attribute ld.pld_attributes;
+                                })));
               (* type fieldErrorOfInputs = {message?: string} *)
               Type.mk
                 (mkloc ("fieldErrorOf" ^ String.capitalize_ascii txt) ptype_loc)
@@ -200,6 +228,7 @@ let map_type_decl
               (* type useFormParamsOfInputs<'resolver> = {
                    resolver?: 'resolver,
                    defaultValues?: inputs,
+                   mode?: [#onBlur | #onChange | #onSubmit | #onTouched | #all],
                  } *)
               Type.mk
                 (mkloc
@@ -218,9 +247,36 @@ let map_type_decl
                          ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
                          ~mut:Immutable (mknoloc "defaultValues")
                          (Typ.constr (lid txt) []);
+                       Type.field
+                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
+                         ~mut:Immutable (mknoloc "mode")
+                         (Typ.variant
+                            [
+                              Rf.tag (mknoloc "onBlur") true [];
+                              Rf.tag (mknoloc "onChange") true [];
+                              Rf.tag (mknoloc "onSubmit") true [];
+                              Rf.tag (mknoloc "onTouched") true [];
+                              Rf.tag (mknoloc "all") true [];
+                            ]
+                            Closed None);
                      ]);
             ]
         in
+        let type_decls2 =
+          Str.type_ Nonrecursive
+            [
+              (* type inputsWithId = {id: string, ...} *)
+              Type.mk
+                (mkloc (txt ^ "WithId") ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     (Type.field ~mut:Immutable (mknoloc "id")
+                        (Typ.constr (lid "string") [])
+                     :: lds));
+            ]
+        in
+
         (* @module("react-hook-form")
            external useFormOfInputs: (~options: useFormParamsOfInputs<'resolver>=?) => useFormReturnOfInputs = "useForm" *)
         let primitive_use_form =
@@ -390,7 +446,455 @@ let map_type_decl
                             ]));
                   ]))
         in
-        [ type_decls; primitive_use_form; module_controller ]
+
+        let type_decls3 =
+          lds
+          |> List.filter_map
+               (fun
+                 ({ pld_name = { txt = field_name }; pld_type } :
+                   label_declaration)
+               ->
+                 match pld_type with
+                 (* if the field has array type, e.g. array<item> *)
+                 | {
+                  ptyp_desc =
+                    Ptyp_constr
+                      ( { txt = Lident "array" },
+                        [
+                          {
+                            ptyp_desc =
+                              Ptyp_constr ({ txt = Lident item_name }, []);
+                          };
+                        ] );
+                 } ->
+                     Some
+                       (Str.type_ Recursive
+                          [
+                            (* type useFieldArrayReturnOfInputsCart = {
+                                 fields: array<itemWithId>,
+                                 append: item => unit,
+                                 remove: int => unit,
+                               } *)
+                            Type.mk
+                              (mkloc
+                                 ("useFieldArrayReturnOf"
+                                 ^ String.capitalize_ascii txt
+                                 ^ String.capitalize_ascii field_name)
+                                 ptype_loc)
+                              ~priv:Public
+                              ~kind:
+                                (Ptype_record
+                                   [
+                                     Type.field ~mut:Immutable
+                                       (mknoloc "fields")
+                                       (Typ.constr (lid "array")
+                                          [
+                                            Typ.constr
+                                              (lid @@ item_name ^ "WithId")
+                                              [];
+                                          ]);
+                                     Type.field ~mut:Immutable
+                                       (mknoloc "append")
+                                       (uncurried_core_type_arrow ~arity:1
+                                          [
+                                            Typ.arrow Nolabel
+                                              (Typ.constr (lid item_name) [])
+                                              (Typ.constr (lid "unit") []);
+                                          ]);
+                                     Type.field ~mut:Immutable
+                                       (mknoloc "remove")
+                                       (uncurried_core_type_arrow ~arity:1
+                                          [
+                                            Typ.arrow Nolabel
+                                              (Typ.constr (lid "int") [])
+                                              (Typ.constr (lid "unit") []);
+                                          ]);
+                                   ]);
+                            (* type useFieldArrayParamsOfInputsCart = {
+                                 name: variantOfInputs,
+                                 control: controlOfInputs,
+                               } *)
+                            Type.mk
+                              (mkloc
+                                 ("useFieldArrayParamsOf"
+                                 ^ String.capitalize_ascii txt
+                                 ^ String.capitalize_ascii field_name)
+                                 ptype_loc)
+                              ~priv:Public
+                              ~kind:
+                                (Ptype_record
+                                   [
+                                     Type.field ~mut:Immutable (mknoloc "name")
+                                       (Typ.constr
+                                          (lid @@ "variantOf"
+                                          ^ String.capitalize_ascii txt)
+                                          []);
+                                     Type.field ~mut:Immutable
+                                       (mknoloc "control")
+                                       (Typ.constr
+                                          (lid @@ "controlOf"
+                                          ^ String.capitalize_ascii txt)
+                                          []);
+                                   ]);
+                          ])
+                 | _ -> None)
+        in
+
+        (* @module("react-hook-form")
+            external useFieldArrayOfInputsCart: useFieldArrayParamsOfInputsCart => useFieldArrayReturnOfInputsCart =
+              "useFieldArray" *)
+        let primitive_use_field_array =
+          lds
+          |> List.map
+               (fun
+                 ({ pld_name = { txt = field_name }; pld_type } :
+                   label_declaration)
+               ->
+                 match pld_type with
+                 (* if the field has array type, e.g. array<item> *)
+                 | {
+                  ptyp_desc =
+                    Ptyp_constr
+                      ( { txt = Lident "array" },
+                        [ { ptyp_desc = Ptyp_constr (_, []) } ] );
+                 } ->
+                     [
+                       Str.primitive
+                         (Val.mk
+                            ~attrs:
+                              [
+                                Attr.mk (mknoloc "module")
+                                  (PStr
+                                     [
+                                       Str.eval
+                                       @@ Exp.constant
+                                            (Const.string "react-hook-form");
+                                     ]);
+                              ]
+                            ~prim:[ "useFieldArray" ]
+                            (mknoloc @@ "useFieldArrayOf"
+                            ^ String.capitalize_ascii txt
+                            ^ String.capitalize_ascii field_name)
+                            (uncurried_core_type_arrow ~arity:1
+                               [
+                                 Typ.arrow Nolabel
+                                   (Typ.constr
+                                      ~attrs:
+                                        [
+                                          Attr.mk
+                                            (mknoloc "res.namedArgLoc")
+                                            (PStr []);
+                                        ]
+                                      (lid @@ "useFieldArrayParamsOf"
+                                      ^ String.capitalize_ascii txt
+                                      ^ String.capitalize_ascii field_name)
+                                      [])
+                                   (Typ.constr
+                                      (lid @@ "useFieldArrayReturnOf"
+                                      ^ String.capitalize_ascii txt
+                                      ^ String.capitalize_ascii field_name)
+                                      []);
+                               ]));
+                     ]
+                 | _ -> [])
+          |> List.concat
+        in
+        (* let fieldArrayCart = ((
+             variantOfInputs: variantOfInputs,
+             index: int,
+             variantOfItem: variantOfItem,
+           )) => {
+             `${(variantOfInputs :> string)}.${index->Belt.Int.toString}.${(variantOfItem :> string)}`->Obj.magic
+           } *)
+        let vb_field_array =
+          lds
+          |> List.filter_map
+               (fun
+                 ({ pld_name = { txt = field_name }; pld_type } :
+                   label_declaration)
+               ->
+                 match pld_type with
+                 (* if the field has array type, e.g. array<item> *)
+                 | {
+                  ptyp_desc =
+                    Ptyp_constr
+                      ( { txt = Lident "array" },
+                        [
+                          {
+                            ptyp_desc =
+                              Ptyp_constr ({ txt = Lident item_name }, []);
+                          };
+                        ] );
+                 } ->
+                     Some
+                       (Str.value Nonrecursive
+                          [
+                            Vb.mk
+                              (Pat.var
+                                 (mknoloc
+                                    ("fieldArrayOf"
+                                    ^ String.capitalize_ascii field_name)))
+                              (uncurried_expr_func ~arity:1
+                                 (Exp.fun_ Nolabel None
+                                    (Pat.tuple
+                                       [
+                                         Pat.constraint_
+                                           (Pat.var
+                                              (mknoloc
+                                                 ("variantOf"
+                                                 ^ String.capitalize_ascii txt)))
+                                           (Typ.constr
+                                              (lid
+                                                 ("variantOf"
+                                                 ^ String.capitalize_ascii txt))
+                                              []);
+                                         Pat.constraint_
+                                           (Pat.var (mknoloc "index"))
+                                           (Typ.constr (lid "int") []);
+                                         Pat.constraint_
+                                           (Pat.var
+                                              (mknoloc
+                                                 ("variantOf"
+                                                 ^ String.capitalize_ascii
+                                                     item_name)))
+                                           (Typ.constr
+                                              (lid
+                                                 ("variantOf"
+                                                 ^ String.capitalize_ascii
+                                                     item_name))
+                                              []);
+                                       ])
+                                    (Exp.apply
+                                       ~attrs:
+                                         [
+                                           Attr.mk (mknoloc "res.uapp")
+                                             (PStr []);
+                                           Attr.mk (mknoloc "res.braces")
+                                             (PStr []);
+                                         ]
+                                       (Exp.ident
+                                          (mknoloc
+                                             (Longident.Ldot
+                                                (Lident "Obj", "magic"))))
+                                       [
+                                         ( Nolabel,
+                                           Exp.apply
+                                             ~attrs:
+                                               [
+                                                 Attr.mk
+                                                   (mknoloc "res.template")
+                                                   (PStr []);
+                                               ]
+                                             (Exp.ident (lid "^"))
+                                             [
+                                               ( Nolabel,
+                                                 Exp.apply
+                                                   ~attrs:
+                                                     [
+                                                       Attr.mk
+                                                         (mknoloc "res.template")
+                                                         (PStr []);
+                                                     ]
+                                                   (Exp.ident (lid "^"))
+                                                   [
+                                                     ( Nolabel,
+                                                       Exp.apply
+                                                         ~attrs:
+                                                           [
+                                                             Attr.mk
+                                                               (mknoloc
+                                                                  "res.template")
+                                                               (PStr []);
+                                                           ]
+                                                         (Exp.ident (lid "^"))
+                                                         [
+                                                           ( Nolabel,
+                                                             Exp.apply
+                                                               ~attrs:
+                                                                 [
+                                                                   Attr.mk
+                                                                     (mknoloc
+                                                                        "res.template")
+                                                                     (PStr []);
+                                                                 ]
+                                                               (Exp.ident
+                                                                  (lid "^"))
+                                                               [
+                                                                 ( Nolabel,
+                                                                   Exp.apply
+                                                                     ~attrs:
+                                                                       [
+                                                                         Attr.mk
+                                                                           (mknoloc
+                                                                              "res.template")
+                                                                           (PStr
+                                                                              []);
+                                                                       ]
+                                                                     (Exp.ident
+                                                                        (lid "^"))
+                                                                     [
+                                                                       ( Nolabel,
+                                                                         Exp
+                                                                         .apply
+                                                                           ~attrs:
+                                                                             [
+                                                                               Attr
+                                                                               .mk
+                                                                                (
+                                                                                mknoloc
+                                                                                "res.template")
+                                                                                (
+                                                                                PStr
+                                                                                []);
+                                                                             ]
+                                                                           (Exp
+                                                                            .ident
+                                                                              (lid
+                                                                                "^"))
+                                                                           [
+                                                                             ( Nolabel,
+                                                                               Exp
+                                                                               .constant
+                                                                                ~attrs:
+                                                                                [
+                                                                                Attr
+                                                                                .mk
+                                                                                (
+                                                                                mknoloc
+                                                                                "res.template")
+                                                                                (
+                                                                                PStr
+                                                                                []);
+                                                                                ]
+                                                                                (
+                                                                                Const
+                                                                                .string
+                                                                                ~quotation_delimiter:
+                                                                                "*j"
+                                                                              "")
+                                                                             );
+                                                                             ( Nolabel,
+                                                                               Exp
+                                                                               .coerce
+                                                                                (
+                                                                                Exp
+                                                                                .ident
+                                                                                (
+                                                                                lid
+                                                                                (
+                                                                                "variantOf"
+                                                                                ^ 
+                                                                                String
+                                                                                .capitalize_ascii
+                                                                                txt
+                                                                                )))
+                                                                                None
+                                                                                (
+                                                                                Typ
+                                                                                .constr
+                                                                                (
+                                                                                lid
+                                                                                "string")
+                                                                                [])
+                                                                             );
+                                                                           ] );
+                                                                       ( Nolabel,
+                                                                         Exp
+                                                                         .constant
+                                                                           ~attrs:
+                                                                             [
+                                                                               Attr
+                                                                               .mk
+                                                                                (
+                                                                                mknoloc
+                                                                                "res.template")
+                                                                                (
+                                                                                PStr
+                                                                                []);
+                                                                             ]
+                                                                           (Const
+                                                                            .string
+                                                                              ~quotation_delimiter:
+                                                                                "*j"
+                                                                              ".")
+                                                                       );
+                                                                     ] );
+                                                                 ( Nolabel,
+                                                                   Exp.apply
+                                                                     ~attrs:
+                                                                       [
+                                                                         Attr.mk
+                                                                           (mknoloc
+                                                                              "res.uapp")
+                                                                           (PStr
+                                                                              []);
+                                                                       ]
+                                                                     (Exp.ident
+                                                                        (mknoloc
+                                                                           (Longident
+                                                                            .Ldot
+                                                                              ( Ldot
+                                                                                ( 
+                                                                                Lident
+                                                                                "Belt",
+                                                                                "Int"
+                                                                                ),
+                                                                                "toString"
+                                                                              ))))
+                                                                     [
+                                                                       ( Nolabel,
+                                                                         Exp
+                                                                         .ident
+                                                                           (lid
+                                                                              "index")
+                                                                       );
+                                                                     ] );
+                                                               ] );
+                                                           ( Nolabel,
+                                                             Exp.constant
+                                                               ~attrs:
+                                                                 [
+                                                                   Attr.mk
+                                                                     (mknoloc
+                                                                        "res.template")
+                                                                     (PStr []);
+                                                                 ]
+                                                               (Const.string
+                                                                  ~quotation_delimiter:
+                                                                    "*j" ".") );
+                                                         ] );
+                                                     ( Nolabel,
+                                                       Exp.coerce
+                                                         (Exp.ident
+                                                            (lid
+                                                               ("variantOf"
+                                                               ^ String
+                                                                 .capitalize_ascii
+                                                                   item_name)))
+                                                         None
+                                                         (Typ.constr
+                                                            (lid "string") [])
+                                                     );
+                                                   ] );
+                                               ( Nolabel,
+                                                 Exp.constant
+                                                   ~attrs:
+                                                     [
+                                                       Attr.mk
+                                                         (mknoloc "res.template")
+                                                         (PStr []);
+                                                     ]
+                                                   (Const.string
+                                                      ~quotation_delimiter:"*j"
+                                                      "") );
+                                             ] );
+                                       ])));
+                          ])
+                 | _ -> None)
+        in
+
+        [ type_decls; type_decls2; primitive_use_form; module_controller ]
+        @ type_decls3 @ primitive_use_field_array @ vb_field_array
     | _ -> fail ptype_loc "This type is not handled by @ppx_ts.keyOf"
   else []
 
