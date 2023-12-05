@@ -1,24 +1,30 @@
 {
-  "name": "spice-ppx",
+  "name": "rhf-app",
+  "jsx": {
+    "version": 4,
+    "mode": "automatic"
+  },
   "sources": [
     {
       "dir": "__tests__",
       "type": "dev"
     },
     {
-      "dir": "src"
+      "dir": "src",
+      "subdirs": true
     }
   ],
   "package-specs": [
     {
-      "module": "commonjs",
+      "module": "es6",
       "in-source": true
     }
   ],
-  "bs-dependencies": [],
-  "bs-dev-dependencies": [
-    "@glennsl/rescript-jest"
+  "suffix": ".mjs",
+  "bs-dependencies": [
+    "@rescript/react"
   ],
+  "bs-dev-dependencies": [],
   "ppx-flags": [
     "../ppx"
   ],
@@ -29,5 +35,15 @@
   "generators": [],
   "bsc-flags": [
     "-bs-super-errors"
-  ]
+  ],
+  "gentypeconfig": {
+    "language": "typescript",
+    "shims": {},
+    "generatedFileExtension": ".gen.tsx",
+    "module": "es6",
+    "debug": {
+      "all": false,
+      "basic": false
+    }
+  }
 }
