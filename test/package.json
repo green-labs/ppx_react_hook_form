@@ -1,19 +1,38 @@
 {
-  "name": "ppx-rhf-test",
-  "packageManager": "pnpm@8.8.0",
-  "version": "0.0.1",
-  "description": "Test ppx-rhf",
-  "license": "MIT",
-  "devDependencies": {
-    "@glennsl/rescript-jest": "^0.10.0",
-    "jest": "^27.3.1",
-    "rescript": "^11.0.0-rc.5"
-  },
+  "name": "rhf-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
     "res:build": "rescript",
     "res:clean": "rescript clean",
-    "res:watch": "rescript build -w",
-    "test": "jest",
-    "test:watch": "jest --watchAll"
+    "res:watch": "rescript build -w"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.3.2",
+    "@material-ui/core": "^4.12.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@rescript/react": "0.12.0-alpha.2",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "react-router-dom": "^6.20.0",
+    "rescript": "11.0.0-rc.6",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
   }
 }
