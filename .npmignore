@@ -1,6 +1,5 @@
 .github
 .vscode
-examples
 test
 src/bin
 src/ppx
@@ -8,5 +7,8 @@ src/.ocamlformat
 src/dune
 src/dune-project
 src/dune-workspace
-src/ppx_spice.opam
+src/ppx_rhf.opam
 .changeset
+doc
+.editorconfig
+CONTRIBUTING.md
