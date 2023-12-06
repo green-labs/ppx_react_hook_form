@@ -8,7 +8,7 @@ type item = {
 @rhf
 type inputs = {cart: array<item>}
 
-@react.component @genType
+@react.component
 let default = () => {
   let {register, control, handleSubmit, formState: {errors}} = useFormOfInputs(
     ~options={

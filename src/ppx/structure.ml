@@ -964,7 +964,7 @@ let map_type_decl
           module_controller;
         ]
         @ type_decls3 @ primitive_use_field_array @ vb_field_array
-    | _ -> fail ptype_loc "This type is not handled by @ppx_ts.keyOf"
+    | _ -> fail ptype_loc "This type is not handled by @ppx_react_hook_form"
   else []
 
 let map_structure_item mapper ({ pstr_desc } as structure_item) =

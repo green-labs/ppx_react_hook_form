@@ -4,7 +4,7 @@ type inputs = {
   exampleRequired: string,
 }
 
-@react.component @genType
+@react.component
 let default = () => {
   let {register, handleSubmit, watch, formState, getFieldState, setValue} = useFormOfInputs()
   let onSubmit = (data: inputs) => Js.log(data)
