@@ -47,14 +47,14 @@ and fieldErrorOfInputs = {message?: string}
 @unboxed
 type watchReturnOfInputs = String(string) | Number(float)
 
-type rec useFormReturnOfInputs<'setValueAs, 'value> = {
+type rec useFormReturnOfInputs<'setValueAs> = {
   control: controlOfInputs,
   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
   handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
   watch: variantOfInputs => watchReturnOfInputs,
   formState: formStateOfInputs,
   getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs,
-  setValue: (variantOfInputs, 'value) => unit,
+  setValue: (variantOfInputs, ReactHookForm.value) => unit,
 } 
 and controlOfInputs
 and variantOfInputs = | @as("example") Example | @as("exampleRequired") ExampleRequired | @as("cart") Cart
@@ -81,7 +81,7 @@ type inputsWithId = {
 @module("react-hook-form")
 external useFormOfInputs: (
   ~options: useFormParamsOfInputs<'resolver>=?
-) => useFormReturnOfInputs<'setValueAs, 'value> = "useForm"
+) => useFormReturnOfInputs<'setValueAs> = "useForm"
 
 module ControllerOfInputs = {
   type controllerRulesOfInputs = {required?: bool}
