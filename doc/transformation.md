@@ -42,42 +42,46 @@ type inputs = {
 }
 
 // generated
+type rec fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs}
+and fieldErrorOfInputs = {message?: string}
+@unboxed
+type watchReturnOfInputs = String(string) | Number(float)
+
+type rec useFormReturnOfInputs<'setValueAs, 'value> = {
+  control: controlOfInputs,
+  register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
+  handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
+  watch: variantOfInputs => watchReturnOfInputs,
+  formState: formStateOfInputs,
+  getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs,
+  setValue: (variantOfInputs, 'value) => unit,
+} 
+and controlOfInputs
+and variantOfInputs = | @as("example") Example | @as("exampleRequired") ExampleRequired | @as("cart") Cart
+and registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs: 'setValueAs}
+and formStateOfInputs = {isDirty: bool, isValid: bool, errors: fieldErrorsOfInputs}
+and fieldErrorsOfInputs = {
+  example?: fieldErrorOfInputs,
+  exampleRequired?: fieldErrorOfInputs,
+  cart?: array<fieldErrorsOfItem>
+}
+and useFormParamsOfInputs<'resolver> = {
+  resolver?: 'resolver,
+  defaultValues?: inputs,
+  mode?: [#onBlur | #onChange | #onSubmit | #onTouched | #all],
+}
+
 type inputsWithId = {
   id: string,
   example: string,
   exampleRequired: string,
   cart: array<item>
 }
-type variantOfInputs = | @as("example") Example | @as("exampleRequired") ExampleRequired
-type fieldErrorOfInputs = {message?: string}
-type fieldErrorsOfInputs = {
-  example?: fieldErrorOfInputs,
-  exampleRequired?: fieldErrorOfInputs,
-  cart?: array<fieldErrorsOfItem>
-}
 
-@unboxed
-type watchReturnOfInputs = String(string) | Number(float)
-
-type formStateOfInputs = {errors: fieldErrorsOfInputs}
-type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs: 'setValueAs}
-type controlOfInputs
-
-type rec useFormReturnOfInputs<'setValueAs> = {
-  control: controlOfInputs,
-  register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
-  handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
-  watch: variantOfInputs => watchReturnOfInputs,
-  formState: formStateOfInputs,
-}
-
-type useFormParamsOfInputs<'resolver> = {
-  resolver?: 'resolver,
-  defaultValues?: inputs,
-  mode?: [#onBlur | #onChange | #onSubmit | #onTouched | #all],
-}
 @module("react-hook-form")
-external useFormOfInputs: (~options: useFormParamsOfInputs<'resolver>=?) => useFormReturnOfInputs<'setValueAs> = "useForm"
+external useFormOfInputs: (
+  ~options: useFormParamsOfInputs<'resolver>=?
+) => useFormReturnOfInputs<'setValueAs, 'value> = "useForm"
 
 module ControllerOfInputs = {
   type controllerRulesOfInputs = {required?: bool}

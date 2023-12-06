@@ -18,6 +18,56 @@ let map_type_decl
         let type_decls =
           Str.type_ Recursive
             [
+              (* type fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs} *)
+              Type.mk
+                (mkloc ("fieldStateOf" ^ String.capitalize_ascii txt) ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     [
+                       Type.field ~mut:Immutable (mknoloc "invalid")
+                         (Typ.constr (lid "bool") []);
+                       Type.field ~mut:Immutable (mknoloc "isDirty")
+                         (Typ.constr (lid "bool") []);
+                       Type.field ~mut:Immutable (mknoloc "isTouched")
+                         (Typ.constr (lid "bool") []);
+                       Type.field ~mut:Immutable (mknoloc "error")
+                         (Typ.constr
+                            (lid @@ "fieldErrorOf" ^ String.capitalize_ascii txt)
+                            []);
+                     ]);
+              (* type fieldErrorOfInputs = {message?: string} *)
+              Type.mk
+                (mkloc ("fieldErrorOf" ^ String.capitalize_ascii txt) ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     [
+                       Type.field
+                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
+                         ~mut:Immutable (mknoloc "message")
+                         (Typ.constr (lid "string") []);
+                     ]);
+              (* @unboxed type watchReturnOfInputs = String(string) | Number(float) *)
+              Type.mk
+                (mkloc
+                   ("watchReturnOf" ^ String.capitalize_ascii txt)
+                   ptype_loc)
+                ~attrs:[ Attr.mk (mknoloc "unboxed") (PStr []) ]
+                ~priv:Public
+                ~kind:
+                  (Ptype_variant
+                     [
+                       Type.constructor (mknoloc "String")
+                         ~args:(Pcstr_tuple [ Typ.constr (lid "string") [] ]);
+                       Type.constructor (mknoloc "Number")
+                         ~args:(Pcstr_tuple [ Typ.constr (lid "float") [] ]);
+                     ]);
+            ]
+        in
+        let type_decls1 =
+          Str.type_ Recursive
+            [
               (* type useFormReturnOfInputs<'setValueAs> = {
                   control: controlOfInputs,
                   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
@@ -108,6 +158,42 @@ let map_type_decl
                          (Typ.constr
                             (lid @@ "formStateOf" ^ String.capitalize_ascii txt)
                             []);
+                       (* getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs, *)
+                       Type.field ~mut:Immutable (mknoloc "getFieldState")
+                         (uncurried_core_type_arrow ~arity:2
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf"
+                                   ^ String.capitalize_ascii txt)
+                                   [])
+                                (Typ.arrow Nolabel
+                                   (Typ.constr
+                                      (lid @@ "formStateOf"
+                                      ^ String.capitalize_ascii txt)
+                                      [])
+                                   (Typ.constr
+                                      (lid @@ "fieldStateOf"
+                                      ^ String.capitalize_ascii txt)
+                                      []));
+                            ]);
+                       (* setValue: (variantOfInputs, ReactHookForm.value) => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "setValue")
+                         (uncurried_core_type_arrow ~arity:2
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf"
+                                   ^ String.capitalize_ascii txt)
+                                   [])
+                                (Typ.arrow Nolabel
+                                   (Typ.constr
+                                      (mknoloc
+                                         (Longident.Ldot
+                                            (Lident "ReactHookForm", "value")))
+                                      [])
+                                   (Typ.constr (lid "unit") []));
+                            ]);
                      ]);
               (* type controlOfInputs *)
               Type.mk
@@ -137,28 +223,17 @@ let map_type_decl
                          ~mut:Immutable (mknoloc "setValueAs")
                          (Typ.var "setValueAs");
                      ]);
-              (* @unboxed type watchReturnOfInputs = String(string) | Number(float) *)
-              Type.mk
-                (mkloc
-                   ("watchReturnOf" ^ String.capitalize_ascii txt)
-                   ptype_loc)
-                ~attrs:[ Attr.mk (mknoloc "unboxed") (PStr []) ]
-                ~priv:Public
-                ~kind:
-                  (Ptype_variant
-                     [
-                       Type.constructor (mknoloc "String")
-                         ~args:(Pcstr_tuple [ Typ.constr (lid "string") [] ]);
-                       Type.constructor (mknoloc "Number")
-                         ~args:(Pcstr_tuple [ Typ.constr (lid "float") [] ]);
-                     ]);
-              (* type formStateOfInputs = {errors: fieldErrorsOfInputs} *)
+              (* type formStateOfInputs = {isDirty: bool, isValid: bool, errors: fieldErrorsOfInputs} *)
               Type.mk
                 (mkloc ("formStateOf" ^ String.capitalize_ascii txt) ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
                      [
+                       Type.field ~mut:Immutable (mknoloc "isDirty")
+                         (Typ.constr (lid "bool") []);
+                       Type.field ~mut:Immutable (mknoloc "isValid")
+                         (Typ.constr (lid "bool") []);
                        Type.field ~mut:Immutable (mknoloc "errors")
                          (Typ.constr
                             (lid @@ "fieldErrorsOf"
@@ -213,18 +288,6 @@ let map_type_decl
                                   pld_attributes =
                                     add_optional_attribute ld.pld_attributes;
                                 })));
-              (* type fieldErrorOfInputs = {message?: string} *)
-              Type.mk
-                (mkloc ("fieldErrorOf" ^ String.capitalize_ascii txt) ptype_loc)
-                ~priv:Public
-                ~kind:
-                  (Ptype_record
-                     [
-                       Type.field
-                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
-                         ~mut:Immutable (mknoloc "message")
-                         (Typ.constr (lid "string") []);
-                     ]);
               (* type useFormParamsOfInputs<'resolver> = {
                    resolver?: 'resolver,
                    defaultValues?: inputs,
@@ -278,7 +341,7 @@ let map_type_decl
         in
 
         (* @module("react-hook-form")
-           external useFormOfInputs: (~options: useFormParamsOfInputs<'resolver>=?) => useFormReturnOfInputs = "useForm" *)
+           external useFormOfInputs: (~options: useFormParamsOfInputs<'resolver>=?) => useFormReturnOfInputs<'setValueAs> = "useForm" *)
         let primitive_use_form =
           Str.primitive
             (Val.mk
@@ -893,7 +956,13 @@ let map_type_decl
                  | _ -> None)
         in
 
-        [ type_decls; type_decls2; primitive_use_form; module_controller ]
+        [
+          type_decls;
+          type_decls1;
+          type_decls2;
+          primitive_use_form;
+          module_controller;
+        ]
         @ type_decls3 @ primitive_use_field_array @ vb_field_array
     | _ -> fail ptype_loc "This type is not handled by @ppx_ts.keyOf"
   else []

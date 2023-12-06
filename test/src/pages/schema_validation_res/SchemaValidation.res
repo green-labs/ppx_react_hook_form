@@ -13,39 +13,6 @@ let schema = Zod.z->Zod.object(
   ),
 )
 
-// type variantOfSchema = | @as("firstName") FirstName | @as("age") Age
-// type fieldErrorOfSchema = {message?: string}
-// type fieldErrorsOfSchema = {
-//   firstName?: fieldErrorOfSchema,
-//   age?: fieldErrorOfSchema,
-// }
-
-// @unboxed
-// type watchReturnOfSchema = String(string) | Number(float)
-
-// type formStateOfSchema = {errors: fieldErrorsOfSchema}
-
-// type registerOptionsOfSchema<'setValueAs> = {
-//   required?: bool,
-//   setValueAs?: 'setValueAs,
-// }
-
-// type rec useFormReturnOfSchema<'setValueAs> = {
-//   register: (variantOfSchema, ~options: registerOptionsOfSchema<'setValueAs>=?) => JsxDOM.domProps,
-//   handleSubmit: (schema => unit) => JsxEvent.Form.t => unit,
-//   watch: variantOfSchema => watchReturnOfSchema,
-//   formState: formStateOfSchema,
-// }
-
-// type useFormParamsOfSchema<'resolver> = {
-//   resolver?: 'resolver,
-//   defaultValues?: schema,
-// }
-// @module("react-hook-form")
-// external useFormOfSchema: (
-//   ~options: useFormParamsOfSchema<'resolver>=?,
-// ) => useFormReturnOfSchema<'setValueAs> = "useForm"
-
 @react.component @genType
 let default = () => {
   let {register, handleSubmit, watch, formState: {errors}} = useFormOfSchema(
