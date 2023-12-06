@@ -33,7 +33,7 @@ let rule_rhf_value =
   Context_free.Rule.special_function "rhfValue" expand_rhf_value
 
 (* transform the spread form
-    <Form {...spread(form)} />*)
+    <Form {...rhfSpread(form)} />*)
 let expand_rhf_spread e =
   match e.pexp_desc with
   | Pexp_apply (_, [ (_, expr) ]) ->
