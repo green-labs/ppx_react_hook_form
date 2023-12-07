@@ -1,5 +1,6 @@
 @rhf
 type item = {name: string, price: float, quantity: float}
+
 @rhf
 type inputs = {cart: array<item>}
 

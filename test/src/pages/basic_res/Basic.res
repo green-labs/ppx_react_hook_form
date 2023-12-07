@@ -24,5 +24,3 @@ let default = () => {
     <input type_="submit" />
   </form>
 }
-
-let _ = rhfValue(0)

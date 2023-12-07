@@ -6,7 +6,7 @@ open Utils
 let map_type_decl
     {
       ptype_attributes;
-      ptype_name = { txt };
+      ptype_name = { txt = record_name };
       ptype_manifest;
       ptype_kind;
       ptype_loc;
@@ -20,7 +20,9 @@ let map_type_decl
             [
               (* type fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs} *)
               Type.mk
-                (mkloc ("fieldStateOf" ^ String.capitalize_ascii txt) ptype_loc)
+                (mkloc
+                   ("fieldStateOf" ^ String.capitalize_ascii record_name)
+                   ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -33,12 +35,15 @@ let map_type_decl
                          (Typ.constr (lid "bool") []);
                        Type.field ~mut:Immutable (mknoloc "error")
                          (Typ.constr
-                            (lid @@ "fieldErrorOf" ^ String.capitalize_ascii txt)
+                            (lid @@ "fieldErrorOf"
+                            ^ String.capitalize_ascii record_name)
                             []);
                      ]);
               (* type fieldErrorOfInputs = {message?: string} *)
               Type.mk
-                (mkloc ("fieldErrorOf" ^ String.capitalize_ascii txt) ptype_loc)
+                (mkloc
+                   ("fieldErrorOf" ^ String.capitalize_ascii record_name)
+                   ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -51,7 +56,7 @@ let map_type_decl
               (* @unboxed type watchReturnOfInputs = String(string) | Number(float) *)
               Type.mk
                 (mkloc
-                   ("watchReturnOf" ^ String.capitalize_ascii txt)
+                   ("watchReturnOf" ^ String.capitalize_ascii record_name)
                    ptype_loc)
                 ~attrs:[ Attr.mk (mknoloc "unboxed") (PStr []) ]
                 ~priv:Public
@@ -77,7 +82,7 @@ let map_type_decl
                     } *)
               Type.mk
                 (mkloc
-                   ("useFormReturnOf" ^ String.capitalize_ascii txt)
+                   ("useFormReturnOf" ^ String.capitalize_ascii record_name)
                    ptype_loc)
                 ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
                 ~priv:Public
@@ -87,7 +92,8 @@ let map_type_decl
                        (* control: controlOfInputs *)
                        Type.field ~mut:Immutable (mknoloc "control")
                          (Typ.constr
-                            (lid @@ "controlOf" ^ String.capitalize_ascii txt)
+                            (lid @@ "controlOf"
+                            ^ String.capitalize_ascii record_name)
                             []);
                        (* register: (variantOfInputs, ~options: registerOptionsOfInputs=?) => JsxDOM.domProps, *)
                        Type.field ~mut:Immutable (mknoloc "register")
@@ -96,7 +102,7 @@ let map_type_decl
                               Typ.arrow Nolabel
                                 (Typ.constr
                                    (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii txt)
+                                   ^ String.capitalize_ascii record_name)
                                    [])
                                 (Typ.arrow (Optional "options")
                                    (Typ.constr
@@ -107,7 +113,7 @@ let map_type_decl
                                             (PStr []);
                                         ]
                                       (lid @@ "registerOptionsOf"
-                                      ^ String.capitalize_ascii txt)
+                                      ^ String.capitalize_ascii record_name)
                                       [ Typ.var "setValueAs" ])
                                    (Typ.constr
                                       (mknoloc
@@ -123,7 +129,7 @@ let map_type_decl
                                 (uncurried_core_type_arrow ~arity:1
                                    [
                                      Typ.arrow Nolabel
-                                       (Typ.constr (lid txt) [])
+                                       (Typ.constr (lid record_name) [])
                                        (Typ.constr (lid "unit") []);
                                    ])
                                 (uncurried_core_type_arrow ~arity:1
@@ -146,17 +152,18 @@ let map_type_decl
                               Typ.arrow Nolabel
                                 (Typ.constr
                                    (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii txt)
+                                   ^ String.capitalize_ascii record_name)
                                    [])
                                 (Typ.constr
                                    (lid @@ "watchReturnOf"
-                                   ^ String.capitalize_ascii txt)
+                                   ^ String.capitalize_ascii record_name)
                                    []);
                             ]);
                        (* formState: formStateOfInputs, *)
                        Type.field ~mut:Immutable (mknoloc "formState")
                          (Typ.constr
-                            (lid @@ "formStateOf" ^ String.capitalize_ascii txt)
+                            (lid @@ "formStateOf"
+                            ^ String.capitalize_ascii record_name)
                             []);
                        (* getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs, *)
                        Type.field ~mut:Immutable (mknoloc "getFieldState")
@@ -165,16 +172,16 @@ let map_type_decl
                               Typ.arrow Nolabel
                                 (Typ.constr
                                    (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii txt)
+                                   ^ String.capitalize_ascii record_name)
                                    [])
                                 (Typ.arrow Nolabel
                                    (Typ.constr
                                       (lid @@ "formStateOf"
-                                      ^ String.capitalize_ascii txt)
+                                      ^ String.capitalize_ascii record_name)
                                       [])
                                    (Typ.constr
                                       (lid @@ "fieldStateOf"
-                                      ^ String.capitalize_ascii txt)
+                                      ^ String.capitalize_ascii record_name)
                                       []));
                             ]);
                        (* setValue: (variantOfInputs, ReactHookForm.value) => unit, *)
@@ -184,7 +191,7 @@ let map_type_decl
                               Typ.arrow Nolabel
                                 (Typ.constr
                                    (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii txt)
+                                   ^ String.capitalize_ascii record_name)
                                    [])
                                 (Typ.arrow Nolabel
                                    (Typ.constr
@@ -197,17 +204,21 @@ let map_type_decl
                      ]);
               (* type controlOfInputs *)
               Type.mk
-                (mkloc ("controlOf" ^ String.capitalize_ascii txt) ptype_loc)
+                (mkloc
+                   ("controlOf" ^ String.capitalize_ascii record_name)
+                   ptype_loc)
                 ~priv:Public ~kind:Ptype_abstract;
               (* type variantOfinputs = | @as("example") Example | @as("exampleRequired") ExampleRequired *)
               Type.mk
-                (mkloc ("variantOf" ^ String.capitalize_ascii txt) ptype_loc)
+                (mkloc
+                   ("variantOf" ^ String.capitalize_ascii record_name)
+                   ptype_loc)
                 ~priv:Public
                 ~kind:(Ptype_variant (make_const_decls fields ptype_loc));
               (* type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs?: 'setValueAs} *)
               Type.mk
                 (mkloc
-                   ("registerOptionsOf" ^ String.capitalize_ascii txt)
+                   ("registerOptionsOf" ^ String.capitalize_ascii record_name)
                    ptype_loc)
                 ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
                 ~priv:Public
@@ -225,7 +236,9 @@ let map_type_decl
                      ]);
               (* type formStateOfInputs = {isDirty: bool, isValid: bool, errors: fieldErrorsOfInputs} *)
               Type.mk
-                (mkloc ("formStateOf" ^ String.capitalize_ascii txt) ptype_loc)
+                (mkloc
+                   ("formStateOf" ^ String.capitalize_ascii record_name)
+                   ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -237,13 +250,13 @@ let map_type_decl
                        Type.field ~mut:Immutable (mknoloc "errors")
                          (Typ.constr
                             (lid @@ "fieldErrorsOf"
-                            ^ String.capitalize_ascii txt)
+                            ^ String.capitalize_ascii record_name)
                             []);
                      ]);
               (* type fieldErrorsOfInputs = { example: fieldErrorOfInputs, exampleRequired: fieldErrorOfInputs } *)
               Type.mk
                 (mkloc
-                   ("fieldErrorsOf" ^ String.capitalize_ascii txt)
+                   ("fieldErrorsOf" ^ String.capitalize_ascii record_name)
                    ptype_loc)
                 ~priv:Public
                 ~kind:
@@ -283,7 +296,7 @@ let map_type_decl
                                   pld_type =
                                     Typ.constr
                                       (lid @@ "fieldErrorOf"
-                                      ^ String.capitalize_ascii txt)
+                                      ^ String.capitalize_ascii record_name)
                                       [];
                                   pld_attributes =
                                     add_optional_attribute ld.pld_attributes;
@@ -295,7 +308,7 @@ let map_type_decl
                  } *)
               Type.mk
                 (mkloc
-                   ("useFormParamsOf" ^ String.capitalize_ascii txt)
+                   ("useFormParamsOf" ^ String.capitalize_ascii record_name)
                    ptype_loc)
                 ~params:[ (Typ.var "resolver", (NoVariance, NoInjectivity)) ]
                 ~priv:Public
@@ -309,7 +322,7 @@ let map_type_decl
                        Type.field
                          ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
                          ~mut:Immutable (mknoloc "defaultValues")
-                         (Typ.constr (lid txt) []);
+                         (Typ.constr (lid record_name) []);
                        Type.field
                          ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
                          ~mut:Immutable (mknoloc "mode")
@@ -330,7 +343,7 @@ let map_type_decl
             [
               (* type inputsWithId = {id: string, ...} *)
               Type.mk
-                (mkloc (txt ^ "WithId") ptype_loc)
+                (mkloc (record_name ^ "WithId") ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -354,17 +367,19 @@ let map_type_decl
                         ]);
                  ]
                ~prim:[ "useForm" ]
-               (mknoloc @@ "useFormOf" ^ String.capitalize_ascii txt)
+               (mknoloc @@ "useFormOf" ^ String.capitalize_ascii record_name)
                (uncurried_core_type_arrow ~arity:1
                   [
                     Typ.arrow (Optional "options")
                       (Typ.constr
                          ~attrs:
                            [ Attr.mk (mknoloc "res.namedArgLoc") (PStr []) ]
-                         (lid @@ "useFormParamsOf" ^ String.capitalize_ascii txt)
+                         (lid @@ "useFormParamsOf"
+                         ^ String.capitalize_ascii record_name)
                          [ Typ.var "resolver" ])
                       (Typ.constr
-                         (lid @@ "useFormReturnOf" ^ String.capitalize_ascii txt)
+                         (lid @@ "useFormReturnOf"
+                         ^ String.capitalize_ascii record_name)
                          [ Typ.var "setValueAs" ]);
                   ]))
         in
@@ -383,7 +398,8 @@ let map_type_decl
         let module_controller =
           Sig.module_
             (Md.mk
-               (mknoloc @@ Some ("ControllerOf" ^ String.capitalize_ascii txt))
+               (mknoloc
+               @@ Some ("ControllerOf" ^ String.capitalize_ascii record_name))
                (Mty.signature
                   [
                     Sig.type_ Recursive
@@ -391,7 +407,8 @@ let map_type_decl
                         (* type controllerRulesOfInputs = {required?: bool} *)
                         Type.mk
                           (mknoloc
-                             ("controllerRulesOf" ^ String.capitalize_ascii txt))
+                             ("controllerRulesOf"
+                             ^ String.capitalize_ascii record_name))
                           ~priv:Public
                           ~kind:
                             (Ptype_record
@@ -408,7 +425,8 @@ let map_type_decl
                         (* type controllerFieldsOfInputs = {field: JsxDOM.domProps} *)
                         Type.mk
                           (mknoloc
-                             ("controllerFieldsOf" ^ String.capitalize_ascii txt))
+                             ("controllerFieldsOf"
+                             ^ String.capitalize_ascii record_name))
                           ~priv:Public
                           ~kind:
                             (Ptype_record
@@ -453,7 +471,7 @@ let map_type_decl
                                          (PStr []);
                                      ]
                                    (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii txt)
+                                   ^ String.capitalize_ascii record_name)
                                    [])
                                 (Typ.arrow (Labelled "control")
                                    (Typ.constr
@@ -464,7 +482,7 @@ let map_type_decl
                                             (PStr []);
                                         ]
                                       (lid @@ "controlOf"
-                                      ^ String.capitalize_ascii txt)
+                                      ^ String.capitalize_ascii record_name)
                                       [])
                                    (Typ.arrow (Labelled "rules")
                                       (Typ.constr
@@ -475,7 +493,7 @@ let map_type_decl
                                                (PStr []);
                                            ]
                                          (lid @@ "controllerRulesOf"
-                                         ^ String.capitalize_ascii txt)
+                                         ^ String.capitalize_ascii record_name)
                                          [])
                                       (Typ.arrow (Labelled "render")
                                          (uncurried_core_type_arrow
@@ -490,8 +508,8 @@ let map_type_decl
                                               Typ.arrow Nolabel
                                                 (Typ.constr
                                                    (lid @@ "controllerFieldsOf"
-                                                   ^ String.capitalize_ascii txt
-                                                   )
+                                                   ^ String.capitalize_ascii
+                                                       record_name)
                                                    [])
                                                 (Typ.constr
                                                    (mknoloc
@@ -540,7 +558,7 @@ let map_type_decl
                             Type.mk
                               (mkloc
                                  ("useFieldArrayReturnOf"
-                                 ^ String.capitalize_ascii txt
+                                 ^ String.capitalize_ascii record_name
                                  ^ String.capitalize_ascii field_name)
                                  ptype_loc)
                               ~priv:Public
@@ -579,7 +597,7 @@ let map_type_decl
                             Type.mk
                               (mkloc
                                  ("useFieldArrayParamsOf"
-                                 ^ String.capitalize_ascii txt
+                                 ^ String.capitalize_ascii record_name
                                  ^ String.capitalize_ascii field_name)
                                  ptype_loc)
                               ~priv:Public
@@ -589,13 +607,15 @@ let map_type_decl
                                      Type.field ~mut:Immutable (mknoloc "name")
                                        (Typ.constr
                                           (lid @@ "variantOf"
-                                          ^ String.capitalize_ascii txt)
+                                          ^ String.capitalize_ascii record_name
+                                          )
                                           []);
                                      Type.field ~mut:Immutable
                                        (mknoloc "control")
                                        (Typ.constr
                                           (lid @@ "controlOf"
-                                          ^ String.capitalize_ascii txt)
+                                          ^ String.capitalize_ascii record_name
+                                          )
                                           []);
                                    ]);
                           ])
@@ -635,7 +655,7 @@ let map_type_decl
                               ]
                             ~prim:[ "useFieldArray" ]
                             (mknoloc @@ "useFieldArrayOf"
-                            ^ String.capitalize_ascii txt
+                            ^ String.capitalize_ascii record_name
                             ^ String.capitalize_ascii field_name)
                             (uncurried_core_type_arrow ~arity:1
                                [
@@ -648,12 +668,12 @@ let map_type_decl
                                             (PStr []);
                                         ]
                                       (lid @@ "useFieldArrayParamsOf"
-                                      ^ String.capitalize_ascii txt
+                                      ^ String.capitalize_ascii record_name
                                       ^ String.capitalize_ascii field_name)
                                       [])
                                    (Typ.constr
                                       (lid @@ "useFieldArrayReturnOf"
-                                      ^ String.capitalize_ascii txt
+                                      ^ String.capitalize_ascii record_name
                                       ^ String.capitalize_ascii field_name)
                                       []);
                                ]));
@@ -661,6 +681,53 @@ let map_type_decl
                  | _ -> [])
           |> List.concat
         in
+        let vd_field_array =
+          lds
+          |> List.filter_map
+               (fun
+                 ({ pld_name = { txt = field_name }; pld_type } :
+                   label_declaration)
+               ->
+                 match pld_type with
+                 (* if the field has array type, e.g. array<item> *)
+                 | {
+                  ptyp_desc =
+                    Ptyp_constr
+                      ( { txt = Lident "array" },
+                        [
+                          {
+                            ptyp_desc =
+                              Ptyp_constr ({ txt = Lident item_name }, []);
+                          };
+                        ] );
+                 } ->
+                     Some
+                       (Sig.value
+                          (Val.mk
+                             (mknoloc
+                                ("fieldArrayOf"
+                                ^ String.capitalize_ascii field_name))
+                             (uncurried_core_type_arrow ~arity:1
+                                [
+                                  Typ.arrow Nolabel
+                                    (Typ.tuple
+                                       [
+                                         Typ.constr
+                                           (lid @@ "variantOf"
+                                           ^ String.capitalize_ascii record_name
+                                           )
+                                           [];
+                                         Typ.constr (lid "int") [];
+                                         Typ.constr
+                                           (lid @@ "variantOf"
+                                           ^ String.capitalize_ascii item_name)
+                                           [];
+                                       ])
+                                    (Typ.var "a");
+                                ])))
+                 | _ -> None)
+        in
+
         [
           type_decls;
           type_decls1;
@@ -668,7 +735,7 @@ let map_type_decl
           primitive_use_form;
           module_controller;
         ]
-        @ type_decls3 @ primitive_use_field_array
+        @ type_decls3 @ primitive_use_field_array @ vd_field_array
     | _ -> fail ptype_loc "This type is not handled by @ppx_react_hook_form"
   else []
 
