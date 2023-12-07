@@ -17,6 +17,17 @@ type inputs = {
 }
 
 // generated
+type inputsWithId = {
+  id: string,
+  example: string,
+  exampleRequired: string,
+  cart: array<item>
+}
+type defaultValuesOfInputs = {
+  example?: string,
+  exampleRequired?: string,
+  cart?: array<item>
+}
 type rec fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs}
 and fieldErrorOfInputs = {message?: string}
 @unboxed
@@ -42,15 +53,8 @@ and fieldErrorsOfInputs = {
 }
 and useFormParamsOfInputs<'resolver> = {
   resolver?: 'resolver,
-  defaultValues?: inputs,
+  defaultValues?: defaultValuesOfInput,
   mode?: [#onBlur | #onChange | #onSubmit | #onTouched | #all],
-}
-
-type inputsWithId = {
-  id: string,
-  example: string,
-  exampleRequired: string,
-  cart: array<item>
 }
 
 @module("react-hook-form")

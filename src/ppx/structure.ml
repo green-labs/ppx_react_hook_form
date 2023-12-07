@@ -16,6 +16,41 @@ let map_type_decl
     | None, Ptype_record lds ->
         let fields = lds |> List.map (fun { pld_name = { txt } } -> txt) in
         let type_decls =
+          Str.type_ Nonrecursive
+            [
+              (* type inputsWithId = {id: string, ...} *)
+              Type.mk
+                (mkloc (record_name ^ "WithId") ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     (Type.field ~mut:Immutable (mknoloc "id")
+                        (Typ.constr (lid "string") [])
+                     :: lds));
+            ]
+        in
+        let type_decls1 =
+          Str.type_ Nonrecursive
+            [
+              (* type inputsWithId = {id: string, ...} *)
+              Type.mk
+                (mkloc
+                   ("defaultValuesOf" ^ String.capitalize_ascii record_name)
+                   ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     (lds
+                     |> List.map (fun ld ->
+                            {
+                              ld with
+                              pld_attributes =
+                                remove_optional_attribute ld.pld_attributes
+                                |> add_optional_attribute;
+                            })));
+            ]
+        in
+        let type_decls2 =
           Str.type_ Recursive
             [
               (* type fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs} *)
@@ -70,7 +105,7 @@ let map_type_decl
                      ]);
             ]
         in
-        let type_decls1 =
+        let type_decls3 =
           Str.type_ Recursive
             [
               (* type useFormReturnOfInputs<'setValueAs> = {
@@ -303,7 +338,7 @@ let map_type_decl
                                 })));
               (* type useFormParamsOfInputs<'resolver> = {
                    resolver?: 'resolver,
-                   defaultValues?: inputs,
+                   defaultValues?: defaultValuesOfInputs,
                    mode?: [#onBlur | #onChange | #onSubmit | #onTouched | #all],
                  } *)
               Type.mk
@@ -322,7 +357,10 @@ let map_type_decl
                        Type.field
                          ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
                          ~mut:Immutable (mknoloc "defaultValues")
-                         (Typ.constr (lid record_name) []);
+                         (Typ.constr
+                            (lid @@ "defaultValuesOf"
+                            ^ String.capitalize_ascii record_name)
+                            []);
                        Type.field
                          ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
                          ~mut:Immutable (mknoloc "mode")
@@ -336,20 +374,6 @@ let map_type_decl
                             ]
                             Closed None);
                      ]);
-            ]
-        in
-        let type_decls2 =
-          Str.type_ Nonrecursive
-            [
-              (* type inputsWithId = {id: string, ...} *)
-              Type.mk
-                (mkloc (record_name ^ "WithId") ptype_loc)
-                ~priv:Public
-                ~kind:
-                  (Ptype_record
-                     (Type.field ~mut:Immutable (mknoloc "id")
-                        (Typ.constr (lid "string") [])
-                     :: lds));
             ]
         in
 
@@ -528,7 +552,7 @@ let map_type_decl
                   ]))
         in
 
-        let type_decls3 =
+        let type_decls4 =
           lds
           |> List.filter_map
                (fun
@@ -982,10 +1006,11 @@ let map_type_decl
           type_decls;
           type_decls1;
           type_decls2;
+          type_decls3;
           primitive_use_form;
           module_controller;
         ]
-        @ type_decls3 @ primitive_use_field_array @ vb_field_array
+        @ type_decls4 @ primitive_use_field_array @ vb_field_array
     | _ -> fail ptype_loc "This type is not handled by @ppx_react_hook_form"
   else []
 
