@@ -6,10 +6,10 @@
   "author": "Woonki Moon<wk.moon@greenlabs.co.kr>",
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/mununki/ppx-react-hook-form.git"
+    "url": "git+https://github.com/green-labs/ppx_react_hook_form.git"
   },
   "bugs": {
-    "url": "https://gitlab.com/mununki/ppx-react-hook-form/-/issues"
+    "url": "https://github.com/green-labs/ppx_react_hook_form/issues"
   },
   "keywords": [
     "ReScript",
