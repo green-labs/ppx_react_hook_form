@@ -1,0 +1,162 @@
+name: ppx_spice publish
+
+on: [workflow_dispatch]
+
+jobs:
+  build_linux:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: src
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        ocaml-compiler:
+          - 4.14.0
+    container:
+      image: ocaml/opam:alpine-3.16-ocaml-4.14
+      options: --user root
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Opam init
+        run: opam init -a --disable-sandboxing --compiler=4.14.0
+
+      - name: Install deps
+        run: opam install . --deps-only --with-test
+
+      - name: Build
+        run: opam exec -- dune build --profile static
+
+      - name: Copy built PPX file
+        run: |
+          mv ./_build/default/bin/bin.exe ppx.exe
+
+      - name: (only on release) Upload artifacts ${{ matrix.os }}
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ matrix.os }}
+          path: src/ppx.exe
+          if-no-files-found: error
+
+  build_macos:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: src
+    strategy:
+      matrix:
+        os: [macOS-latest]
+        ocaml-compiler:
+          - 4.14.0
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use OCaml ${{ matrix.ocaml-compiler}}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+
+      - name: Install deps
+        run: opam install . --deps-only --with-test
+
+      - name: Build
+        run: opam exec -- dune build
+
+      - name: Copy built PPX file
+        run: |
+          mv ./_build/default/bin/bin.exe ppx.exe
+
+      - name: (only on release) Upload artifacts ${{ matrix.os }}
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ matrix.os }}
+          path: src/ppx.exe
+          if-no-files-found: error
+
+  build_windows:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: src
+    strategy:
+      matrix:
+        os: [windows-latest]
+        ocaml-compiler:
+          - 4.14.0
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use OCaml ${{ matrix.ocaml-compiler}}
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+
+      - name: Install deps
+        run: opam install . --deps-only --with-test
+
+      - name: Build
+        run: opam exec -- dune build
+
+      - name: Copy built PPX file
+        run: |
+          mv ./_build/default/bin/bin.exe ppx.exe
+
+      - name: (only on release) Upload artifacts ${{ matrix.os }}
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ matrix.os }}
+          path: src/ppx.exe
+          if-no-files-found: error
+
+  publish:
+    needs: [build_linux, build_macos, build_windows]
+    name: (only on release) Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Download linux artifacts
+        if: success()
+        uses: actions/download-artifact@master
+        with:
+          name: ubuntu-latest
+          path: binaries/linux
+
+      - name: Download macOS artifacts
+        if: success()
+        uses: actions/download-artifact@master
+        with:
+          name: macOS-latest
+          path: binaries/darwin
+
+      - name: Download windows artifacts
+        if: success()
+        uses: actions/download-artifact@master
+        with:
+          name: windows-latest
+          path: binaries/windows
+
+      - name: Move artifacts
+        if: success()
+        run: |
+          mkdir -p bin
+          mv binaries/linux/ppx.exe ppx-linux.exe
+          mv binaries/darwin/ppx.exe ppx-osx.exe
+          mv binaries/windows/ppx.exe ppx-windows.exe
+
+      - name: Publish
+        if: success()
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
