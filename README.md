@@ -33,7 +33,7 @@ let default = () => {
 }
 ```
 
-[More exmaples](doc/examples.md)
+[More examples](doc/examples.md)
 
 ## Getting Started
 
