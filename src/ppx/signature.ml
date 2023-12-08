@@ -32,7 +32,7 @@ let map_type_decl
         let type_decls1 =
           Sig.type_ Nonrecursive
             [
-              (* type inputsWithId = {id: string, ...} *)
+              (* type defaultValuesOfInputs = {example?: string, exampleRequired?: string} *)
               Type.mk
                 (mkloc
                    ("defaultValuesOf" ^ String.capitalize_ascii record_name)
@@ -113,6 +113,7 @@ let map_type_decl
                   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
                   handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
                   watch: variantOfInputs => watchReturnOfInputs,
+                  reset: (~options: defaultValuesOfInputs=?) => unit,
                   formState: formStateOfInputs,
                     } *)
               Type.mk
@@ -193,6 +194,23 @@ let map_type_decl
                                    (lid @@ "watchReturnOf"
                                    ^ String.capitalize_ascii record_name)
                                    []);
+                            ]);
+                       (* reset: (~options: defaultValuesOfInputs=?) => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "reset")
+                         (uncurried_core_type_arrow ~arity:1
+                            [
+                              Typ.arrow (Optional "options")
+                                (Typ.constr
+                                   ~attrs:
+                                     [
+                                       Attr.mk
+                                         (mknoloc "res.namedArgLoc")
+                                         (PStr []);
+                                     ]
+                                   (lid @@ "defaultValuesOf"
+                                   ^ String.capitalize_ascii record_name)
+                                   [])
+                                (Typ.constr (lid "unit") []);
                             ]);
                        (* formState: formStateOfInputs, *)
                        Type.field ~mut:Immutable (mknoloc "formState")

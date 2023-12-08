@@ -41,6 +41,7 @@ type rec useFormReturnOfInputs<'setValueAs> = {
   formState: formStateOfInputs,
   getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs,
   setValue: (variantOfInputs, ReactHookForm.value) => unit,
+  reset: (~options:defaultValues=?) => unit
 } 
 and controlOfInputs
 and variantOfInputs = | @as("example") Example | @as("exampleRequired") ExampleRequired | @as("cart") Cart
