@@ -7,6 +7,7 @@ let fail loc message = Location.raise_errorf ~loc "%s" message
 let mkloc txt loc = { Location.txt; loc }
 let mknoloc txt = mkloc txt Location.none
 let lid ?(loc = Location.none) s = mkloc (Longident.parse s) loc
+let capitalize = String.capitalize_ascii
 
 let make_const_decls labels loc =
   labels
@@ -20,6 +21,10 @@ let make_const_decls labels loc =
              ])
 (* make constructor declaration with label *)
 
+let attr_named_arg = Attr.mk (mknoloc "res.namedArgLoc") (PStr [])
+let attr_template = Attr.mk (mknoloc "res.template") (PStr [])
+let attr_uapp = Attr.mk (mknoloc "res.uapp") (PStr [])
+let attr_brace = Attr.mk (mknoloc "res.braces") (PStr [])
 let has_attribute { attr_name = { Location.txt } } = txt = attribute_name
 
 let remove_optional_attribute (attrs : attributes) : attributes =

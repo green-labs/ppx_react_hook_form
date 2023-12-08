@@ -34,9 +34,7 @@ let map_type_decl
             [
               (* type defaultValuesOfInputs = {example?: string, exampleRequired?: string} *)
               Type.mk
-                (mkloc
-                   ("defaultValuesOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("defaultValuesOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -55,9 +53,7 @@ let map_type_decl
             [
               (* type fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs} *)
               Type.mk
-                (mkloc
-                   ("fieldStateOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("fieldStateOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -70,15 +66,12 @@ let map_type_decl
                          (Typ.constr (lid "bool") []);
                        Type.field ~mut:Immutable (mknoloc "error")
                          (Typ.constr
-                            (lid @@ "fieldErrorOf"
-                            ^ String.capitalize_ascii record_name)
+                            (lid @@ "fieldErrorOf" ^ capitalize record_name)
                             []);
                      ]);
               (* type fieldErrorOfInputs = {message?: string} *)
               Type.mk
-                (mkloc
-                   ("fieldErrorOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("fieldErrorOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -90,9 +83,7 @@ let map_type_decl
                      ]);
               (* @unboxed type watchReturnOfInputs = String(string) | Number(float) *)
               Type.mk
-                (mkloc
-                   ("watchReturnOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("watchReturnOf" ^ capitalize record_name) ptype_loc)
                 ~attrs:[ Attr.mk (mknoloc "unboxed") (PStr []) ]
                 ~priv:Public
                 ~kind:
@@ -117,9 +108,7 @@ let map_type_decl
                   formState: formStateOfInputs,
                     } *)
               Type.mk
-                (mkloc
-                   ("useFormReturnOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("useFormReturnOf" ^ capitalize record_name) ptype_loc)
                 ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
                 ~priv:Public
                 ~kind:
@@ -128,8 +117,7 @@ let map_type_decl
                        (* control: controlOfInputs *)
                        Type.field ~mut:Immutable (mknoloc "control")
                          (Typ.constr
-                            (lid @@ "controlOf"
-                            ^ String.capitalize_ascii record_name)
+                            (lid @@ "controlOf" ^ capitalize record_name)
                             []);
                        (* register: (variantOfInputs, ~options: registerOptionsOfInputs=?) => JsxDOM.domProps, *)
                        Type.field ~mut:Immutable (mknoloc "register")
@@ -137,19 +125,12 @@ let map_type_decl
                             [
                               Typ.arrow Nolabel
                                 (Typ.constr
-                                   (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii record_name)
+                                   (lid @@ "variantOf" ^ capitalize record_name)
                                    [])
                                 (Typ.arrow (Optional "options")
-                                   (Typ.constr
-                                      ~attrs:
-                                        [
-                                          Attr.mk
-                                            (mknoloc "res.namedArgLoc")
-                                            (PStr []);
-                                        ]
+                                   (Typ.constr ~attrs:[ attr_named_arg ]
                                       (lid @@ "registerOptionsOf"
-                                      ^ String.capitalize_ascii record_name)
+                                     ^ capitalize record_name)
                                       [ Typ.var "setValueAs" ])
                                    (Typ.constr
                                       (mknoloc
@@ -187,12 +168,11 @@ let map_type_decl
                             [
                               Typ.arrow Nolabel
                                 (Typ.constr
-                                   (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii record_name)
+                                   (lid @@ "variantOf" ^ capitalize record_name)
                                    [])
                                 (Typ.constr
                                    (lid @@ "watchReturnOf"
-                                   ^ String.capitalize_ascii record_name)
+                                  ^ capitalize record_name)
                                    []);
                             ]);
                        (* reset: (~options: defaultValuesOfInputs=?) => unit, *)
@@ -200,23 +180,16 @@ let map_type_decl
                          (uncurried_core_type_arrow ~arity:1
                             [
                               Typ.arrow (Optional "options")
-                                (Typ.constr
-                                   ~attrs:
-                                     [
-                                       Attr.mk
-                                         (mknoloc "res.namedArgLoc")
-                                         (PStr []);
-                                     ]
+                                (Typ.constr ~attrs:[ attr_named_arg ]
                                    (lid @@ "defaultValuesOf"
-                                   ^ String.capitalize_ascii record_name)
+                                  ^ capitalize record_name)
                                    [])
                                 (Typ.constr (lid "unit") []);
                             ]);
                        (* formState: formStateOfInputs, *)
                        Type.field ~mut:Immutable (mknoloc "formState")
                          (Typ.constr
-                            (lid @@ "formStateOf"
-                            ^ String.capitalize_ascii record_name)
+                            (lid @@ "formStateOf" ^ capitalize record_name)
                             []);
                        (* getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs, *)
                        Type.field ~mut:Immutable (mknoloc "getFieldState")
@@ -224,17 +197,16 @@ let map_type_decl
                             [
                               Typ.arrow Nolabel
                                 (Typ.constr
-                                   (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii record_name)
+                                   (lid @@ "variantOf" ^ capitalize record_name)
                                    [])
                                 (Typ.arrow Nolabel
                                    (Typ.constr
                                       (lid @@ "formStateOf"
-                                      ^ String.capitalize_ascii record_name)
+                                     ^ capitalize record_name)
                                       [])
                                    (Typ.constr
                                       (lid @@ "fieldStateOf"
-                                      ^ String.capitalize_ascii record_name)
+                                     ^ capitalize record_name)
                                       []));
                             ]);
                        (* setValue: (variantOfInputs, ReactHookForm.value) => unit, *)
@@ -243,8 +215,7 @@ let map_type_decl
                             [
                               Typ.arrow Nolabel
                                 (Typ.constr
-                                   (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii record_name)
+                                   (lid @@ "variantOf" ^ capitalize record_name)
                                    [])
                                 (Typ.arrow Nolabel
                                    (Typ.constr
@@ -257,22 +228,16 @@ let map_type_decl
                      ]);
               (* type controlOfInputs *)
               Type.mk
-                (mkloc
-                   ("controlOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("controlOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public ~kind:Ptype_abstract;
               (* type variantOfinputs = | @as("example") Example | @as("exampleRequired") ExampleRequired *)
               Type.mk
-                (mkloc
-                   ("variantOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("variantOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
                 ~kind:(Ptype_variant (make_const_decls fields ptype_loc));
               (* type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs?: 'setValueAs} *)
               Type.mk
-                (mkloc
-                   ("registerOptionsOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("registerOptionsOf" ^ capitalize record_name) ptype_loc)
                 ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
                 ~priv:Public
                 ~kind:
@@ -289,9 +254,7 @@ let map_type_decl
                      ]);
               (* type formStateOfInputs = {isDirty: bool, isValid: bool, errors: fieldErrorsOfInputs} *)
               Type.mk
-                (mkloc
-                   ("formStateOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("formStateOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -302,15 +265,12 @@ let map_type_decl
                          (Typ.constr (lid "bool") []);
                        Type.field ~mut:Immutable (mknoloc "errors")
                          (Typ.constr
-                            (lid @@ "fieldErrorsOf"
-                            ^ String.capitalize_ascii record_name)
+                            (lid @@ "fieldErrorsOf" ^ capitalize record_name)
                             []);
                      ]);
               (* type fieldErrorsOfInputs = { example: fieldErrorOfInputs, exampleRequired: fieldErrorOfInputs } *)
               Type.mk
-                (mkloc
-                   ("fieldErrorsOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("fieldErrorsOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
                 ~kind:
                   (Ptype_record
@@ -336,8 +296,7 @@ let map_type_decl
                                     Typ.constr (lid "array")
                                       [
                                         Typ.constr
-                                          (lid @@ "fieldErrorsOf"
-                                         ^ String.capitalize_ascii l)
+                                          (lid @@ "fieldErrorsOf" ^ capitalize l)
                                           [];
                                       ];
                                   pld_attributes =
@@ -349,7 +308,7 @@ let map_type_decl
                                   pld_type =
                                     Typ.constr
                                       (lid @@ "fieldErrorOf"
-                                      ^ String.capitalize_ascii record_name)
+                                     ^ capitalize record_name)
                                       [];
                                   pld_attributes =
                                     add_optional_attribute ld.pld_attributes;
@@ -360,9 +319,7 @@ let map_type_decl
                    mode?: [#onBlur | #onChange | #onSubmit | #onTouched | #all],
                  } *)
               Type.mk
-                (mkloc
-                   ("useFormParamsOf" ^ String.capitalize_ascii record_name)
-                   ptype_loc)
+                (mkloc ("useFormParamsOf" ^ capitalize record_name) ptype_loc)
                 ~params:[ (Typ.var "resolver", (NoVariance, NoInjectivity)) ]
                 ~priv:Public
                 ~kind:
@@ -376,8 +333,7 @@ let map_type_decl
                          ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
                          ~mut:Immutable (mknoloc "defaultValues")
                          (Typ.constr
-                            (lid @@ "defaultValuesOf"
-                            ^ String.capitalize_ascii record_name)
+                            (lid @@ "defaultValuesOf" ^ capitalize record_name)
                             []);
                        Type.field
                          ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
@@ -410,19 +366,15 @@ let map_type_decl
                         ]);
                  ]
                ~prim:[ "useForm" ]
-               (mknoloc @@ "useFormOf" ^ String.capitalize_ascii record_name)
+               (mknoloc @@ "useFormOf" ^ capitalize record_name)
                (uncurried_core_type_arrow ~arity:1
                   [
                     Typ.arrow (Optional "options")
-                      (Typ.constr
-                         ~attrs:
-                           [ Attr.mk (mknoloc "res.namedArgLoc") (PStr []) ]
-                         (lid @@ "useFormParamsOf"
-                         ^ String.capitalize_ascii record_name)
+                      (Typ.constr ~attrs:[ attr_named_arg ]
+                         (lid @@ "useFormParamsOf" ^ capitalize record_name)
                          [ Typ.var "resolver" ])
                       (Typ.constr
-                         (lid @@ "useFormReturnOf"
-                         ^ String.capitalize_ascii record_name)
+                         (lid @@ "useFormReturnOf" ^ capitalize record_name)
                          [ Typ.var "setValueAs" ]);
                   ]))
         in
@@ -441,8 +393,7 @@ let map_type_decl
         let module_controller =
           Str.module_
             (Mb.mk
-               (mknoloc
-               @@ Some ("ControllerOf" ^ String.capitalize_ascii record_name))
+               (mknoloc @@ Some ("ControllerOf" ^ capitalize record_name))
                (Mod.structure
                   [
                     Str.type_ Recursive
@@ -450,8 +401,7 @@ let map_type_decl
                         (* type controllerRulesOfInputs = {required?: bool} *)
                         Type.mk
                           (mknoloc
-                             ("controllerRulesOf"
-                             ^ String.capitalize_ascii record_name))
+                             ("controllerRulesOf" ^ capitalize record_name))
                           ~priv:Public
                           ~kind:
                             (Ptype_record
@@ -468,8 +418,7 @@ let map_type_decl
                         (* type controllerFieldsOfInputs = {field: JsxDOM.domProps} *)
                         Type.mk
                           (mknoloc
-                             ("controllerFieldsOf"
-                             ^ String.capitalize_ascii record_name))
+                             ("controllerFieldsOf" ^ capitalize record_name))
                           ~priv:Public
                           ~kind:
                             (Ptype_record
@@ -506,53 +455,27 @@ let map_type_decl
                          (uncurried_core_type_arrow ~arity:4
                             [
                               Typ.arrow (Labelled "name")
-                                (Typ.constr
-                                   ~attrs:
-                                     [
-                                       Attr.mk
-                                         (mknoloc "res.namedArgLoc")
-                                         (PStr []);
-                                     ]
-                                   (lid @@ "variantOf"
-                                   ^ String.capitalize_ascii record_name)
+                                (Typ.constr ~attrs:[ attr_named_arg ]
+                                   (lid @@ "variantOf" ^ capitalize record_name)
                                    [])
                                 (Typ.arrow (Labelled "control")
-                                   (Typ.constr
-                                      ~attrs:
-                                        [
-                                          Attr.mk
-                                            (mknoloc "res.namedArgLoc")
-                                            (PStr []);
-                                        ]
+                                   (Typ.constr ~attrs:[ attr_named_arg ]
                                       (lid @@ "controlOf"
-                                      ^ String.capitalize_ascii record_name)
+                                     ^ capitalize record_name)
                                       [])
                                    (Typ.arrow (Labelled "rules")
-                                      (Typ.constr
-                                         ~attrs:
-                                           [
-                                             Attr.mk
-                                               (mknoloc "res.namedArgLoc")
-                                               (PStr []);
-                                           ]
+                                      (Typ.constr ~attrs:[ attr_named_arg ]
                                          (lid @@ "controllerRulesOf"
-                                         ^ String.capitalize_ascii record_name)
+                                        ^ capitalize record_name)
                                          [])
                                       (Typ.arrow (Labelled "render")
                                          (uncurried_core_type_arrow
-                                            ~attrs:
-                                              [
-                                                Attr.mk
-                                                  (mknoloc "res.namedArgLoc")
-                                                  (PStr []);
-                                              ]
-                                            ~arity:1
+                                            ~attrs:[ attr_named_arg ] ~arity:1
                                             [
                                               Typ.arrow Nolabel
                                                 (Typ.constr
                                                    (lid @@ "controllerFieldsOf"
-                                                   ^ String.capitalize_ascii
-                                                       record_name)
+                                                  ^ capitalize record_name)
                                                    [])
                                                 (Typ.constr
                                                    (mknoloc
@@ -601,8 +524,8 @@ let map_type_decl
                             Type.mk
                               (mkloc
                                  ("useFieldArrayReturnOf"
-                                 ^ String.capitalize_ascii record_name
-                                 ^ String.capitalize_ascii field_name)
+                                ^ capitalize record_name ^ capitalize field_name
+                                 )
                                  ptype_loc)
                               ~priv:Public
                               ~kind:
@@ -640,8 +563,8 @@ let map_type_decl
                             Type.mk
                               (mkloc
                                  ("useFieldArrayParamsOf"
-                                 ^ String.capitalize_ascii record_name
-                                 ^ String.capitalize_ascii field_name)
+                                ^ capitalize record_name ^ capitalize field_name
+                                 )
                                  ptype_loc)
                               ~priv:Public
                               ~kind:
@@ -650,15 +573,13 @@ let map_type_decl
                                      Type.field ~mut:Immutable (mknoloc "name")
                                        (Typ.constr
                                           (lid @@ "variantOf"
-                                          ^ String.capitalize_ascii record_name
-                                          )
+                                         ^ capitalize record_name)
                                           []);
                                      Type.field ~mut:Immutable
                                        (mknoloc "control")
                                        (Typ.constr
                                           (lid @@ "controlOf"
-                                          ^ String.capitalize_ascii record_name
-                                          )
+                                         ^ capitalize record_name)
                                           []);
                                    ]);
                           ])
@@ -698,26 +619,19 @@ let map_type_decl
                               ]
                             ~prim:[ "useFieldArray" ]
                             (mknoloc @@ "useFieldArrayOf"
-                            ^ String.capitalize_ascii record_name
-                            ^ String.capitalize_ascii field_name)
+                           ^ capitalize record_name ^ capitalize field_name)
                             (uncurried_core_type_arrow ~arity:1
                                [
                                  Typ.arrow Nolabel
-                                   (Typ.constr
-                                      ~attrs:
-                                        [
-                                          Attr.mk
-                                            (mknoloc "res.namedArgLoc")
-                                            (PStr []);
-                                        ]
+                                   (Typ.constr ~attrs:[ attr_named_arg ]
                                       (lid @@ "useFieldArrayParamsOf"
-                                      ^ String.capitalize_ascii record_name
-                                      ^ String.capitalize_ascii field_name)
+                                     ^ capitalize record_name
+                                     ^ capitalize field_name)
                                       [])
                                    (Typ.constr
                                       (lid @@ "useFieldArrayReturnOf"
-                                      ^ String.capitalize_ascii record_name
-                                      ^ String.capitalize_ascii field_name)
+                                     ^ capitalize record_name
+                                     ^ capitalize field_name)
                                       []);
                                ]));
                      ]
@@ -757,8 +671,7 @@ let map_type_decl
                             Vb.mk
                               (Pat.var
                                  (mknoloc
-                                    ("fieldArrayOf"
-                                    ^ String.capitalize_ascii field_name)))
+                                    ("fieldArrayOf" ^ capitalize field_name)))
                               (uncurried_expr_func ~arity:1
                                  (Exp.fun_ Nolabel None
                                     (Pat.tuple
@@ -767,13 +680,11 @@ let map_type_decl
                                            (Pat.var
                                               (mknoloc
                                                  ("variantOf"
-                                                 ^ String.capitalize_ascii
-                                                     record_name)))
+                                                ^ capitalize record_name)))
                                            (Typ.constr
                                               (lid
                                                  ("variantOf"
-                                                 ^ String.capitalize_ascii
-                                                     record_name))
+                                                ^ capitalize record_name))
                                               []);
                                          Pat.constraint_
                                            (Pat.var (mknoloc "index"))
@@ -782,67 +693,39 @@ let map_type_decl
                                            (Pat.var
                                               (mknoloc
                                                  ("variantOf"
-                                                 ^ String.capitalize_ascii
-                                                     item_name)))
+                                                ^ capitalize item_name)))
                                            (Typ.constr
                                               (lid
                                                  ("variantOf"
-                                                 ^ String.capitalize_ascii
-                                                     item_name))
+                                                ^ capitalize item_name))
                                               []);
                                        ])
-                                    (Exp.apply
-                                       ~attrs:
-                                         [
-                                           Attr.mk (mknoloc "res.uapp")
-                                             (PStr []);
-                                           Attr.mk (mknoloc "res.braces")
-                                             (PStr []);
-                                         ]
+                                    (Exp.apply ~attrs:[ attr_uapp; attr_brace ]
                                        (Exp.ident
                                           (mknoloc
                                              (Longident.Ldot
                                                 (Lident "Obj", "magic"))))
                                        [
                                          ( Nolabel,
-                                           Exp.apply
-                                             ~attrs:
-                                               [
-                                                 Attr.mk
-                                                   (mknoloc "res.template")
-                                                   (PStr []);
-                                               ]
+                                           Exp.apply ~attrs:[ attr_template ]
                                              (Exp.ident (lid "^"))
                                              [
                                                ( Nolabel,
                                                  Exp.apply
-                                                   ~attrs:
-                                                     [
-                                                       Attr.mk
-                                                         (mknoloc "res.template")
-                                                         (PStr []);
-                                                     ]
+                                                   ~attrs:[ attr_template ]
                                                    (Exp.ident (lid "^"))
                                                    [
                                                      ( Nolabel,
                                                        Exp.apply
                                                          ~attrs:
-                                                           [
-                                                             Attr.mk
-                                                               (mknoloc
-                                                                  "res.template")
-                                                               (PStr []);
-                                                           ]
+                                                           [ attr_template ]
                                                          (Exp.ident (lid "^"))
                                                          [
                                                            ( Nolabel,
                                                              Exp.apply
                                                                ~attrs:
                                                                  [
-                                                                   Attr.mk
-                                                                     (mknoloc
-                                                                        "res.template")
-                                                                     (PStr []);
+                                                                   attr_template;
                                                                  ]
                                                                (Exp.ident
                                                                   (lid "^"))
@@ -851,11 +734,7 @@ let map_type_decl
                                                                    Exp.apply
                                                                      ~attrs:
                                                                        [
-                                                                         Attr.mk
-                                                                           (mknoloc
-                                                                              "res.template")
-                                                                           (PStr
-                                                                              []);
+                                                                         attr_template;
                                                                        ]
                                                                      (Exp.ident
                                                                         (lid "^"))
@@ -865,14 +744,7 @@ let map_type_decl
                                                                          .apply
                                                                            ~attrs:
                                                                              [
-                                                                               Attr
-                                                                               .mk
-                                                                                (
-                                                                                mknoloc
-                                                                                "res.template")
-                                                                                (
-                                                                                PStr
-                                                                                []);
+                                                                               attr_template;
                                                                              ]
                                                                            (Exp
                                                                             .ident
@@ -884,14 +756,7 @@ let map_type_decl
                                                                                .constant
                                                                                 ~attrs:
                                                                                 [
-                                                                                Attr
-                                                                                .mk
-                                                                                (
-                                                                                mknoloc
-                                                                                "res.template")
-                                                                                (
-                                                                                PStr
-                                                                                []);
+                                                                                attr_template;
                                                                                 ]
                                                                                 (
                                                                                 Const
@@ -930,14 +795,7 @@ let map_type_decl
                                                                          .constant
                                                                            ~attrs:
                                                                              [
-                                                                               Attr
-                                                                               .mk
-                                                                                (
-                                                                                mknoloc
-                                                                                "res.template")
-                                                                                (
-                                                                                PStr
-                                                                                []);
+                                                                               attr_template;
                                                                              ]
                                                                            (Const
                                                                             .string
@@ -981,10 +839,7 @@ let map_type_decl
                                                              Exp.constant
                                                                ~attrs:
                                                                  [
-                                                                   Attr.mk
-                                                                     (mknoloc
-                                                                        "res.template")
-                                                                     (PStr []);
+                                                                   attr_template;
                                                                  ]
                                                                (Const.string
                                                                   ~quotation_delimiter:
@@ -1005,12 +860,7 @@ let map_type_decl
                                                    ] );
                                                ( Nolabel,
                                                  Exp.constant
-                                                   ~attrs:
-                                                     [
-                                                       Attr.mk
-                                                         (mknoloc "res.template")
-                                                         (PStr []);
-                                                     ]
+                                                   ~attrs:[ attr_template ]
                                                    (Const.string
                                                       ~quotation_delimiter:"*j"
                                                       "") );
