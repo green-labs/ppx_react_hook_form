@@ -1,4 +1,4 @@
-name: ppx_spice build windows
+name: ppx_rhf build windows
 
 on: [workflow_dispatch]
 

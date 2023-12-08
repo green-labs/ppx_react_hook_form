@@ -1,4 +1,4 @@
-name: ppx_spice publish
+name: ppx_rhf publish
 
 on: [workflow_dispatch]
 
