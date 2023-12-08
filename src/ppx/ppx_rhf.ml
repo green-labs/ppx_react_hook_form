@@ -38,8 +38,7 @@ let expand_rhf_spread e =
   match e.pexp_desc with
   | Pexp_apply (_, [ (_, expr) ]) ->
       Some
-        (Exp.apply
-           ~attrs:[ Attr.mk (Utils.mknoloc "res.uapp") (PStr []) ]
+        (Exp.apply ~attrs:[ Utils.attr_uapp ]
            (Exp.ident
               (Utils.mkloc (Longident.Ldot (Lident "Obj", "magic")) e.pexp_loc))
            [ (Nolabel, expr) ])
