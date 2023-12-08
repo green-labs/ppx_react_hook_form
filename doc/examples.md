@@ -25,6 +25,8 @@ let make = () => {
 
 ## Schema validation
 
+* You can use it with any schema validation library binding you like.
+
 ```res
 @rhf
 type schema = {
@@ -48,7 +50,6 @@ let make = () => {
       resolver: Resolver.zodResolver(schema),
       defaultValues: {
         firstName: "ppx",
-        age: None,
       },
     },
   )
@@ -82,7 +83,7 @@ let make = () => {
   </form>
 }
 ```
-### Zod
+#### Example binding of the schema validation library Zod
 
 ```res
 // Zod.res
@@ -105,6 +106,9 @@ external number: (t, params) => number = "number"
 
 @send
 external object: (t, 'schema) => object<'schema> = "object"
+
+@send
+external array: (t, 'schema) => array<'schema> = "array"
 
 @send
 external optional: 'z => optional<'z> = "optional"
