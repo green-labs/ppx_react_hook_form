@@ -76,9 +76,8 @@ let map_type_decl
                 ~kind:
                   (Ptype_record
                      [
-                       Type.field
-                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
-                         ~mut:Immutable (mknoloc "message")
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "message")
                          (Typ.constr (lid "string") []);
                      ]);
               (* @unboxed type watchReturnOfInputs = String(string) | Number(float) *)
@@ -209,9 +208,9 @@ let map_type_decl
                                      ^ capitalize record_name)
                                       []));
                             ]);
-                       (* setValue: (variantOfInputs, ReactHookForm.value) => unit, *)
+                       (* setValue: (variantOfInputs, ReactHookForm.value, ~options: setValueConfigOfInputs=?) => unit, *)
                        Type.field ~mut:Immutable (mknoloc "setValue")
-                         (uncurried_core_type_arrow ~arity:2
+                         (uncurried_core_type_arrow ~arity:3
                             [
                               Typ.arrow Nolabel
                                 (Typ.constr
@@ -223,7 +222,12 @@ let map_type_decl
                                          (Longident.Ldot
                                             (Lident "ReactHookForm", "value")))
                                       [])
-                                   (Typ.constr (lid "unit") []));
+                                   (Typ.arrow (Optional "options")
+                                      (Typ.constr
+                                         (lid @@ "setValueConfigOf"
+                                        ^ capitalize record_name)
+                                         [])
+                                      (Typ.constr (lid "unit") [])));
                             ]);
                      ]);
               (* type controlOfInputs *)
@@ -243,14 +247,11 @@ let map_type_decl
                 ~kind:
                   (Ptype_record
                      [
-                       Type.field
-                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
-                         ~mut:Immutable (mknoloc "required")
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "required")
                          (Typ.constr (lid "bool") []);
-                       Type.field
-                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
-                         ~mut:Immutable (mknoloc "setValueAs")
-                         (Typ.var "setValueAs");
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "setValueAs") (Typ.var "setValueAs");
                      ]);
               (* type formStateOfInputs = {isDirty: bool, isValid: bool, errors: fieldErrorsOfInputs} *)
               Type.mk
@@ -325,19 +326,15 @@ let map_type_decl
                 ~kind:
                   (Ptype_record
                      [
-                       Type.field
-                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
-                         ~mut:Immutable (mknoloc "resolver")
-                         (Typ.var "resolver");
-                       Type.field
-                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
-                         ~mut:Immutable (mknoloc "defaultValues")
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "resolver") (Typ.var "resolver");
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "defaultValues")
                          (Typ.constr
                             (lid @@ "defaultValuesOf" ^ capitalize record_name)
                             []);
-                       Type.field
-                         ~attrs:[ Attr.mk (mknoloc "res.optional") (PStr []) ]
-                         ~mut:Immutable (mknoloc "mode")
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "mode")
                          (Typ.variant
                             [
                               Rf.tag (mknoloc "onBlur") true [];
@@ -347,6 +344,22 @@ let map_type_decl
                               Rf.tag (mknoloc "all") true [];
                             ]
                             Closed None);
+                     ]);
+              Type.mk
+                (mkloc ("setValueConfigOf" ^ capitalize record_name) ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     [
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "shouldValidate")
+                         (Typ.constr (lid "bool") []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "shouldDirty")
+                         (Typ.constr (lid "bool") []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "shouldTouch")
+                         (Typ.constr (lid "bool") []);
                      ]);
             ]
         in

@@ -40,7 +40,7 @@ type rec useFormReturnOfInputs<'setValueAs> = {
   watch: variantOfInputs => watchReturnOfInputs,
   formState: formStateOfInputs,
   getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs,
-  setValue: (variantOfInputs, ReactHookForm.value) => unit,
+  setValue: (variantOfInputs, ReactHookForm.value, ~options: setValueConfigOfInputs=?) => unit,
   reset: (~options:defaultValues=?) => unit
 } 
 and controlOfInputs
@@ -56,6 +56,11 @@ and useFormParamsOfInputs<'resolver> = {
   resolver?: 'resolver,
   defaultValues?: defaultValuesOfInput,
   mode?: [#onBlur | #onChange | #onSubmit | #onTouched | #all],
+}
+and setValueConfigOfInputs = {
+  shouldValidate: bool,
+  shouldDirty: bool,
+  shouldTouch: bool,
 }
 
 @module("react-hook-form")
