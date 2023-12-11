@@ -25,6 +25,7 @@ let attr_named_arg = Attr.mk (mknoloc "res.namedArgLoc") (PStr [])
 let attr_template = Attr.mk (mknoloc "res.template") (PStr [])
 let attr_uapp = Attr.mk (mknoloc "res.uapp") (PStr [])
 let attr_brace = Attr.mk (mknoloc "res.braces") (PStr [])
+let attr_optional = Attr.mk (mknoloc "res.optional") (PStr [])
 let has_attribute { attr_name = { Location.txt } } = txt = attribute_name
 
 let remove_optional_attribute (attrs : attributes) : attributes =
