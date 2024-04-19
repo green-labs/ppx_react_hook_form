@@ -9,7 +9,15 @@ let default = () => {
   let {register, handleSubmit, watch, formState, getFieldState, setValue} = useFormOfInputs()
   let onSubmit = (data: inputs) => Js.log(data)
 
-  Js.log(watch(Example))
+  switch watch(Example) {
+  | Some(Null) => Js.log("null")
+  | Some(Bool(v)) => Js.log(v)
+  | Some(Number(v)) => Js.log(v)
+  | Some(String(v)) => Js.log(v)
+  | Some(Object(v)) => Js.log(v)
+  | Some(Array(v)) => Js.log(v)
+  | None => Js.log("undefined")
+  }
 
   let exampleFieldState = getFieldState(Example, formState)
   Js.log(exampleFieldState)

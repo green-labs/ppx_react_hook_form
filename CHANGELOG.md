@@ -1,6 +1,7 @@
-# v0.0.2 (not released)
+# v0.0.2
 
 - Add setValueConfig
+- Add more variants for watch return type and watch returns option type
 
 # v0.0.1
 
