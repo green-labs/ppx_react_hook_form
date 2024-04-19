@@ -44,7 +44,7 @@ type rec useFormReturnOfInputs<'setValueAs> = {
   control: controlOfInputs,
   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
   handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
-  watch: variantOfInputs => watchReturnOfInputs,
+  watch: variantOfInputs => option<watchReturnOfInputs>,
   formState: formStateOfInputs,
   getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs,
   setValue: (variantOfInputs, ReactHookForm.value, ~options: setValueConfigOfInputs=?) => unit,

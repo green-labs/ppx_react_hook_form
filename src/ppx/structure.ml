@@ -203,7 +203,7 @@ let map_type_decl
                                        (Typ.constr (lid "unit") []);
                                    ]);
                             ]);
-                       (* watch: variantOfInputs => watchReturnOfInputs, *)
+                       (* watch: variantOfInputs => option<watchReturnOfInputs>, *)
                        Type.field ~mut:Immutable (mknoloc "watch")
                          (uncurried_core_type_arrow ~arity:1
                             [
@@ -211,10 +211,13 @@ let map_type_decl
                                 (Typ.constr
                                    (lid @@ "variantOf" ^ capitalize record_name)
                                    [])
-                                (Typ.constr
-                                   (lid @@ "watchReturnOf"
-                                  ^ capitalize record_name)
-                                   []);
+                                (Typ.constr (lid "option")
+                                   [
+                                     Typ.constr
+                                       (lid @@ "watchReturnOf"
+                                      ^ capitalize record_name)
+                                       [];
+                                   ]);
                             ]);
                        (* reset: (~options: defaultValuesOfInputs=?) => unit, *)
                        Type.field ~mut:Immutable (mknoloc "reset")

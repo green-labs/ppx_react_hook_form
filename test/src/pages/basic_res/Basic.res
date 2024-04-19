@@ -10,12 +10,13 @@ let default = () => {
   let onSubmit = (data: inputs) => Js.log(data)
 
   switch watch(Example) {
-  | Null => Js.log("null")
-  | Bool(v) => Js.log(v)
-  | Number(v) => Js.log(v)
-  | String(v) => Js.log(v)
-  | Object(v) => Js.log(v)
-  | Array(v) => Js.log(v)
+  | Some(Null) => Js.log("null")
+  | Some(Bool(v)) => Js.log(v)
+  | Some(Number(v)) => Js.log(v)
+  | Some(String(v)) => Js.log(v)
+  | Some(Object(v)) => Js.log(v)
+  | Some(Array(v)) => Js.log(v)
+  | None => Js.log("undefined")
   }
 
   let exampleFieldState = getFieldState(Example, formState)
