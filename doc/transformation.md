@@ -31,7 +31,14 @@ type defaultValuesOfInputs = {
 type rec fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs}
 and fieldErrorOfInputs = {message?: string}
 @unboxed
-type watchReturnOfInputs = String(string) | Number(float)
+type rec watchReturnOfInputs =
+  | @as(null) Null
+  | Bool(bool)
+  | Number(float)
+  | String(string)
+  | Object(Js.Dict.t<watchReturnOfInputs>)
+  | Array(array<watchReturnOfInputs>)
+
 
 type rec useFormReturnOfInputs<'setValueAs> = {
   control: controlOfInputs,

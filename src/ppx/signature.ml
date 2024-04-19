@@ -80,7 +80,15 @@ let map_type_decl
                          (mknoloc "message")
                          (Typ.constr (lid "string") []);
                      ]);
-              (* @unboxed type watchReturnOfInputs = String(string) | Number(float) *)
+              (* @unboxed
+                 type rec watchReturnOfInputs =
+                   | @as(null) Null
+                   | Bool(bool)
+                   | Number(float)
+                   | String(string)
+                   | Object(Js.Dict.t<watchReturnOfInputs>)
+                   | Array(array<watchReturnOfInputs>)
+              *)
               Type.mk
                 (mkloc ("watchReturnOf" ^ capitalize record_name) ptype_loc)
                 ~attrs:[ Attr.mk (mknoloc "unboxed") (PStr []) ]
@@ -88,10 +96,44 @@ let map_type_decl
                 ~kind:
                   (Ptype_variant
                      [
-                       Type.constructor (mknoloc "String")
-                         ~args:(Pcstr_tuple [ Typ.constr (lid "string") [] ]);
+                       Type.constructor (mknoloc "Null")
+                         ~attrs:
+                           [
+                             Attr.mk (mknoloc "as")
+                               (PStr [ Str.eval @@ Exp.ident (lid "null") ]);
+                           ];
+                       Type.constructor (mknoloc "Bool")
+                         ~args:(Pcstr_tuple [ Typ.constr (lid "bool") [] ]);
                        Type.constructor (mknoloc "Number")
                          ~args:(Pcstr_tuple [ Typ.constr (lid "float") [] ]);
+                       Type.constructor (mknoloc "String")
+                         ~args:(Pcstr_tuple [ Typ.constr (lid "string") [] ]);
+                       Type.constructor (mknoloc "Object")
+                         ~args:
+                           (Pcstr_tuple
+                              [
+                                Typ.constr (lid "Js.Dict.t")
+                                  [
+                                    Typ.constr
+                                      (lid
+                                         ("watchReturnOf"
+                                        ^ capitalize record_name))
+                                      [];
+                                  ];
+                              ]);
+                       Type.constructor (mknoloc "Array")
+                         ~args:
+                           (Pcstr_tuple
+                              [
+                                Typ.constr (lid "array")
+                                  [
+                                    Typ.constr
+                                      (lid
+                                         ("watchReturnOf"
+                                        ^ capitalize record_name))
+                                      [];
+                                  ];
+                              ]);
                      ]);
             ]
         in
