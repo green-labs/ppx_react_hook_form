@@ -26,7 +26,7 @@ type inputsWithId = {
 type defaultValuesOfInputs = {
   example?: string,
   exampleRequired?: string,
-  cart?: array<item>
+  cart?: array<defaultValuesOfItem>
 }
 type rec fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs}
 and fieldErrorOfInputs = {message?: string}
@@ -38,7 +38,6 @@ type rec watchReturnOfInputs =
   | String(string)
   | Object(Js.Dict.t<watchReturnOfInputs>)
   | Array(array<watchReturnOfInputs>)
-
 
 type rec useFormReturnOfInputs<'setValueAs> = {
   control: controlOfInputs,
