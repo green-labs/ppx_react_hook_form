@@ -1,4 +1,6 @@
-# v0.0.3 (unreleased)
+# v0.0.4 (unreleased)
+
+# v0.0.3
 
 - Enhance defaultValuesOf type definition for array types
   - For array types (e.g., `array<t>`), the defaultValuesOf type now uses 
