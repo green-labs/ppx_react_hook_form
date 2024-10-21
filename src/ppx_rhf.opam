@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "ppx_rhf"
-version: "0.0.3"
+version: "0.0.4"
 synopsis: "ReScript PPX for react-hook-form"
 description: """
 ReScript PPX which generates the bindings for react-hook-form
