@@ -1,0 +1,68 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
+    container:
+      image: ocaml/opam:alpine-3.16-ocaml-4.14
+      options: --user root
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - name: Opam init
+      run: opam init -a --disable-sandboxing --compiler=4.14.0
+
+    - name: Install dependencies
+      run: opam install . --deps-only --with-test
+
+    - name: Build project
+      run: opam exec -- dune build --profile static
+
+  build_macos:
+    name: Build on macOS
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: src
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up OCaml
+      uses: ocaml/setup-ocaml@v2
+      with:
+        ocaml-compiler: 4.14.0
+
+    - name: Install dependencies
+      run: opam install . --deps-only --with-test
+
+    - name: Build project
+      run: opam exec -- dune build
+
+  build_windows:
+    name: Build on Windows
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: src
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up OCaml
+      uses: ocaml/setup-ocaml@v2
+      with:
+        ocaml-compiler: 4.14.0
+
+    - name: Install dependencies
+      run: opam install . --deps-only --with-test
+
+    - name: Build project
+      run: opam exec -- dune build
