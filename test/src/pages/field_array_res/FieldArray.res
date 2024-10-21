@@ -50,7 +50,7 @@ let default = () => {
       </div>
     })
     ->React.array}
-    <button type_="button" onClick={_ => append({name: "ppx", quantity: 1., price: 1.})}>
+    <button type_="button" onClick={_ => append({quantity: 1., price: 1.})}>
       {"APPEND"->React.string}
     </button>
     <input type_="submit" />

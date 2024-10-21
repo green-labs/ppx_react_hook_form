@@ -602,7 +602,7 @@ let map_type_decl
                           [
                             (* type useFieldArrayReturnOfInputsCart = {
                                  fields: array<itemWithId>,
-                                 append: item => unit,
+                                 append: defaultValuesOfItem => unit,
                                  remove: int => unit,
                                } *)
                             Type.mk
@@ -628,7 +628,11 @@ let map_type_decl
                                        (uncurried_core_type_arrow ~arity:1
                                           [
                                             Typ.arrow Nolabel
-                                              (Typ.constr (lid item_name) [])
+                                              (Typ.constr
+                                                 (lid
+                                                    ("defaultValuesOf"
+                                                   ^ capitalize item_name))
+                                                 [])
                                               (Typ.constr (lid "unit") []);
                                           ]);
                                      Type.field ~mut:Immutable

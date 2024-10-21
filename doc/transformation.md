@@ -90,7 +90,7 @@ module ControllerOfInputs = {
 // useFieldArray
 type rec useFieldArrayReturnOfInputsCart = {
   fields: array<itemWithId>,
-  append: item => unit,
+  append: defaultValuesOfItem => unit,
   remove: int => unit,
 }
 and useFieldArrayParamsOfInputsCart = {

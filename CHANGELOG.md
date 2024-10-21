@@ -1,4 +1,8 @@
-# v0.0.4 (unreleased)
+# v0.0.4
+
+- Change type signature of append in useFieldArray hook
+  - Updated from `t => unit` to `defaultValuesOfT => unit`
+  - This change provides better type flexibility when appending new items to the array
 
 # v0.0.3
 
