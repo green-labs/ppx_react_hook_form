@@ -1,6 +1,9 @@
 # v0.0.3 (unreleased)
 
-
+- Enhance defaultValuesOf type definition for array types
+  - For array types (e.g., `array<t>`), the defaultValuesOf type now uses 
+    `defaultValuesOfT` for the array items instead of `array<t>`
+  - This allows for more precise default value handling in nested array structures
 
 # v0.0.2
 

@@ -40,8 +40,34 @@ let map_type_decl
                   (Ptype_record
                      (lds
                      |> List.map (fun ld ->
+                            let new_pld_type =
+                              match ld.pld_type with
+                              | {
+                               ptyp_desc =
+                                 Ptyp_constr
+                                   ({ txt = Lident "array" }, [ item_type ]);
+                              } -> (
+                                  match item_type.ptyp_desc with
+                                  | Ptyp_constr ({ txt = Lident item_name }, [])
+                                    when not
+                                           (List.mem item_name
+                                              [
+                                                "string"; "float"; "int"; "bool";
+                                              ]) ->
+                                      Typ.constr (lid "array")
+                                        [
+                                          Typ.constr
+                                            (lid
+                                               ("defaultValuesOf"
+                                              ^ capitalize item_name))
+                                            [];
+                                        ]
+                                  | _ -> ld.pld_type)
+                              | _ -> ld.pld_type
+                            in
                             {
                               ld with
+                              pld_type = new_pld_type;
                               pld_attributes =
                                 remove_optional_attribute ld.pld_attributes
                                 |> add_optional_attribute;

@@ -13,7 +13,7 @@ let default = () => {
   let {register, control, handleSubmit, formState: {errors}} = useFormOfInputs(
     ~options={
       defaultValues: {
-        cart: [{name: "text", quantity: 1., price: 23.}],
+        cart: [{quantity: 1., price: 23.}],
       },
       mode: #onBlur,
     },
