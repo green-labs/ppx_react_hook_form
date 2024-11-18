@@ -56,8 +56,8 @@ devDependencies:
     specifier: ^6.20.0
     version: 6.22.3(react-dom@18.2.0)(react@18.2.0)
   rescript:
-    specifier: 11.1.0-rc.8
-    version: 11.1.0-rc.8
+    specifier: 12.0.0-alpha.4
+    version: 12.0.0-alpha.4
   typescript:
     specifier: ^5.2.2
     version: 5.4.5
@@ -2044,9 +2044,9 @@ packages:
     resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
     dev: false
 
-  /rescript@11.1.0-rc.8:
-    resolution: {integrity: sha512-5It7moo2zRvxJARi8SlEQ5YTXqsfpOpaiDsOa/9V8rE+xY3Hxt3Bhd4tAyOzSLJlpBbB+0wc6JmujhZ61eRHZg==}
-    engines: {node: '>=10'}
+  /rescript@12.0.0-alpha.4:
+    resolution: {integrity: sha512-w9uIv8C8+kBWbcb1GVn1rOdLEj2YX1TIRvUkR6DSvVO8oSdJ0GAUABN7y7WU/+zCkjNwsVrBlO0hG7NTJqXHUA==}
+    engines: {node: '>=18'}
     hasBin: true
     requiresBuild: true
     dev: true
