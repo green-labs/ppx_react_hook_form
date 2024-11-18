@@ -1,6 +1,6 @@
 {
   "name": "@greenlabs/ppx-rhf",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "ReScript PPX which generates the bindings for react-hook-form",
   "license": "MIT",
   "author": "Woonki Moon<wk.moon@greenlabs.co.kr>",
