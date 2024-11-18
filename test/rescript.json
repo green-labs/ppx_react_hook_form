@@ -33,9 +33,7 @@
     "number": "-48"
   },
   "generators": [],
-  "bsc-flags": [
-    "-bs-super-errors"
-  ],
+  "bsc-flags": [],
   "gentypeconfig": {
     "language": "typescript",
     "shims": {},

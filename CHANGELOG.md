@@ -1,6 +1,8 @@
-# v0.0.5 (unreleased)
+# v0.0.6 (unreleased)
 
+# v0.0.5
 
+- Support ReScript v12
 
 # v0.0.4
 
