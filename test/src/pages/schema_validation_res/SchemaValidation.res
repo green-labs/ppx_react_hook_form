@@ -15,7 +15,7 @@ let schema = Zod.z->Zod.object(
 
 @react.component @genType
 let default = () => {
-  let {register, handleSubmit, watch, formState: {errors}} = useFormOfSchema(
+  let {register, handleSubmit, watch, getValues, formState: {errors}} = useFormOfSchema(
     ~options={
       resolver: Resolver.zodResolver(schema),
       defaultValues: {
@@ -27,6 +27,8 @@ let default = () => {
   let onSubmit = (data: schema) => Js.log(data)
 
   Js.log(watch(FirstName))
+
+  Js.log(getValues(FirstName))
 
   <form onSubmit={handleSubmit(onSubmit)}>
     <input {...register(FirstName)} />

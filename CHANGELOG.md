@@ -1,6 +1,6 @@
 # v0.0.7 (unreleased)
 
-
+- Add `getValues` to `useForm` hook
 
 # v0.0.6
 

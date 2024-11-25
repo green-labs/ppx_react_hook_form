@@ -14,6 +14,8 @@ let make = () => {
 
   Js.log(watch(Example))
 
+  Js.log(getValues(Example))
+
   <form onSubmit={handleSubmit(onSubmit)}>
     <input {...register(Example)} defaultValue="test" />
     <input {...register(ExampleRequired, ~options={required: true})} />
@@ -56,6 +58,8 @@ let make = () => {
   let onSubmit = (data: schema) => Js.log(data)
 
   Js.log(watch(FirstName))
+
+  Js.log(getValues(FirstName))
 
   <form onSubmit={handleSubmit(onSubmit)}>
     <input {...register(FirstName)} />
@@ -137,6 +141,8 @@ let default = () => {
   let onSubmit = (data: inputs) => Js.log(data)
 
   Js.log(watch(MyCheckBox))
+
+  Js.log(getValues(MyCheckBox))
 
   <form onSubmit={handleSubmit(onSubmit)}>
     <ControllerOfInputs
