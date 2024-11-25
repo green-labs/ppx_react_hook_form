@@ -18,7 +18,7 @@ let map_type_decl
         let type_decls =
           Str.type_ Nonrecursive
             [
-              (* type inputsWithId = {id: string, ...} *)
+              (* type inputsWithId = {id: string, example?: string, ...} *)
               Type.mk
                 (mkloc (record_name ^ "WithId") ptype_loc)
                 ~priv:Public
@@ -26,7 +26,13 @@ let map_type_decl
                   (Ptype_record
                      (Type.field ~mut:Immutable (mknoloc "id")
                         (Typ.constr (lid "string") [])
-                     :: lds));
+                     :: (lds
+                        |> List.map (fun ld ->
+                               {
+                                 ld with
+                                 pld_attributes =
+                                   add_optional_attribute ld.pld_attributes;
+                               }))));
             ]
         in
         let type_decls1 =
@@ -116,7 +122,7 @@ let map_type_decl
                    | Array(array<watchReturnOfInputs>)
               *)
               Type.mk
-                (mkloc ("watchReturnOf" ^ capitalize record_name) ptype_loc)
+                (mkloc ("valuesOf" ^ capitalize record_name) ptype_loc)
                 ~attrs:[ Attr.mk (mknoloc "unboxed") (PStr []) ]
                 ~priv:Public
                 ~kind:
@@ -142,8 +148,7 @@ let map_type_decl
                                   [
                                     Typ.constr
                                       (lid
-                                         ("watchReturnOf"
-                                        ^ capitalize record_name))
+                                         ("valuesOf" ^ capitalize record_name))
                                       [];
                                   ];
                               ]);
@@ -155,8 +160,7 @@ let map_type_decl
                                   [
                                     Typ.constr
                                       (lid
-                                         ("watchReturnOf"
-                                        ^ capitalize record_name))
+                                         ("valuesOf" ^ capitalize record_name))
                                       [];
                                   ];
                               ]);
@@ -170,7 +174,8 @@ let map_type_decl
                   control: controlOfInputs,
                   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
                   handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
-                  watch: variantOfInputs => watchReturnOfInputs,
+                  watch: variantOfInputs => valuesOfInputs,
+                  getValues: variantOfInputs => option<valuesOfInputs>,
                   reset: (~options: defaultValuesOfInputs=?) => unit,
                   formState: formStateOfInputs,
                     } *)
@@ -229,7 +234,7 @@ let map_type_decl
                                        (Typ.constr (lid "unit") []);
                                    ]);
                             ]);
-                       (* watch: variantOfInputs => option<watchReturnOfInputs>, *)
+                       (* watch: variantOfInputs => option<valuesOfInputs>, *)
                        Type.field ~mut:Immutable (mknoloc "watch")
                          (uncurried_core_type_arrow ~arity:1
                             [
@@ -240,7 +245,23 @@ let map_type_decl
                                 (Typ.constr (lid "option")
                                    [
                                      Typ.constr
-                                       (lid @@ "watchReturnOf"
+                                       (lid @@ "valuesOf"
+                                      ^ capitalize record_name)
+                                       [];
+                                   ]);
+                            ]);
+                       (* getValues: variantOfInputs => option<valuesOfInputs>, *)
+                       Type.field ~mut:Immutable (mknoloc "getValues")
+                         (uncurried_core_type_arrow ~arity:1
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf" ^ capitalize record_name)
+                                   [])
+                                (Typ.constr (lid "option")
+                                   [
+                                     Typ.constr
+                                       (lid @@ "valuesOf"
                                       ^ capitalize record_name)
                                        [];
                                    ]);

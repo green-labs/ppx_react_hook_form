@@ -8,10 +8,12 @@ module Checkbox = {
 
 @react.component @genType
 let default = () => {
-  let {control, handleSubmit, watch} = useFormOfInputs()
+  let {control, handleSubmit, watch, getValues} = useFormOfInputs()
   let onSubmit = (data: inputs) => Js.log(data)
 
   Js.log(watch(MyCheckBox))
+
+  Js.log(getValues(MyCheckBox))
 
   <form onSubmit={handleSubmit(onSubmit)}>
     <ControllerOfInputs

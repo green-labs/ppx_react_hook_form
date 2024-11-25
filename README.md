@@ -18,6 +18,8 @@ let default = () => {
 
   Js.log(watch(Example))
 
+  Js.log(getValues(Example))
+
   let exampleFieldState = getFieldState(Example, formState)
   Js.log(exampleFieldState)
   Js.log(setValue)

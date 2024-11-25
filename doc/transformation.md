@@ -19,9 +19,9 @@ type inputs = {
 // generated
 type inputsWithId = {
   id: string,
-  example: string,
-  exampleRequired: string,
-  cart: array<item>
+  example?: string,
+  exampleRequired?: string,
+  cart?: array<item>
 }
 type defaultValuesOfInputs = {
   example?: string,
@@ -31,19 +31,20 @@ type defaultValuesOfInputs = {
 type rec fieldStateOfInputs = {invalid: bool, isDirty: bool, isTouched: bool, error: fieldErrorOfInputs}
 and fieldErrorOfInputs = {message?: string}
 @unboxed
-type rec watchReturnOfInputs =
+type rec valuesOfInputs =
   | @as(null) Null
   | Bool(bool)
   | Number(float)
   | String(string)
-  | Object(Js.Dict.t<watchReturnOfInputs>)
-  | Array(array<watchReturnOfInputs>)
+  | Object(Js.Dict.t<valuesOfInputs>)
+  | Array(array<valuesOfInputs>)
 
 type rec useFormReturnOfInputs<'setValueAs> = {
   control: controlOfInputs,
   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
   handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
-  watch: variantOfInputs => option<watchReturnOfInputs>,
+  watch: variantOfInputs => option<valuesOfInputs>,
+  getValues: variantOfInputs => option<valuesOfInputs>
   formState: formStateOfInputs,
   getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs,
   setValue: (variantOfInputs, ReactHookForm.value, ~options: setValueConfigOfInputs=?) => unit,
