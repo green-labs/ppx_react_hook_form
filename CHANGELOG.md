@@ -1,6 +1,7 @@
-# v0.0.7 (unreleased)
+# v0.0.7
 
 - Add `getValues` to `useForm` hook
+- Change type `*withId` with optional fields
 
 # v0.0.6
 
