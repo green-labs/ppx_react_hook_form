@@ -1,3 +1,7 @@
+# v0.0.7 (unreleased)
+
+
+
 # v0.0.6
 
 - Remove `-bs-super-errors` flag for the compatibility with ReScript v12
