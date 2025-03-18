@@ -10,7 +10,8 @@ import Controller from "../pages/controller/Controller"
 import ControllerRes from "../pages/controller_res/Controller.gen"
 import FieldArray from "../pages/field_array/FieldArray";
 import FieldArrayRes from "../pages/field_array_res/FieldArray.gen";
-
+import UseWatch from "../pages/use_watch/UseWatch";
+import UseWatchRes from "../pages/use_watch_res/UseWatch.gen";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -47,6 +48,14 @@ const router = createBrowserRouter([
   {
     path: "/field_array_res",
     element: <FieldArrayRes />
+  },
+  {
+    path: "/use_watch",
+    element: <UseWatch />
+  },
+  {
+    path: "/use_watch_res",
+    element: <UseWatchRes />
   },
 ])
 

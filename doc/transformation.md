@@ -88,6 +88,17 @@ module ControllerOfInputs = {
   ) => React.element = "Controller"
 }
 
+//useWatch
+type useWatchParamsOfInputs = {
+  name: variantOfInputs,
+  control: controlOfInputs=?,
+  defaultValue: valueOfInputs=?,
+  disabled: bool=?,
+  exact: bool=?,
+}
+@module("react-hook-form")
+external useWatchOfInputs: useWatchParamsOfInputs => option<valueOfInputs>
+
 // useFieldArray
 type rec useFieldArrayReturnOfInputsCart = {
   fields: array<itemWithId>,
