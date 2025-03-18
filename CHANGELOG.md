@@ -1,6 +1,6 @@
 # v0.0.9(unreleased)
 
-
+- Add `dirtyFields` field to `formState`
 
 # v0.0.8
 
