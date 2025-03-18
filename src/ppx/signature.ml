@@ -599,7 +599,78 @@ let map_type_decl
                   ]))
         in
 
+        (* type useWatchParamsOfInputs = {
+             name: variantOfInputs,
+             control: controlOfInputs=?,
+             defaultValue: valueOfInputs=?,
+             disabled: bool=?,
+             exact: bool=?,
+           } *)
         let type_decls4 =
+          Sig.type_ Recursive
+            [
+              Type.mk
+                (mkloc ("useWatchParamsOf" ^ capitalize record_name) ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     [
+                       Type.field ~mut:Immutable (mknoloc "name")
+                         (Typ.constr
+                            (lid @@ "variantOf" ^ capitalize record_name)
+                            []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "control")
+                         (Typ.constr ~attrs:[ attr_named_arg ]
+                            (lid @@ "controlOf" ^ capitalize record_name)
+                            []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "defaultValue")
+                         (Typ.constr
+                            (lid @@ "valuesOf" ^ capitalize record_name)
+                            []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "disabled")
+                         (Typ.constr (lid "bool") []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "exact")
+                         (Typ.constr (lid "bool") []);
+                     ]);
+            ]
+        in
+
+        (* @module("react-hook-form")
+           external useWatchOfInputs: useWatchParamsOfInputs => option<valuesOfInputs> = "useWatch" *)
+        let primitive_use_watch =
+          Sig.value
+            (Val.mk
+               ~attrs:
+                 [
+                   Attr.mk (mknoloc "module")
+                     (PStr
+                        [
+                          Str.eval
+                          @@ Exp.constant (Const.string "react-hook-form");
+                        ]);
+                 ]
+               ~prim:[ "useWatch" ]
+               (mknoloc @@ "useWatchOf" ^ capitalize record_name)
+               (uncurried_core_type_arrow ~arity:1
+                  [
+                    Typ.arrow Nolabel
+                      (Typ.constr ~attrs:[ attr_named_arg ]
+                         (lid @@ "useWatchParamsOf" ^ capitalize record_name)
+                         [])
+                      (Typ.constr (lid "option")
+                         [
+                           Typ.constr
+                             (lid @@ "valuesOf" ^ capitalize record_name)
+                             [];
+                         ]);
+                  ]))
+        in
+
+        let type_decls5 =
           lds
           |> List.filter_map
                (fun
@@ -799,8 +870,10 @@ let map_type_decl
           type_decls3;
           primitive_use_form;
           module_controller;
+          type_decls4;
+          primitive_use_watch;
         ]
-        @ type_decls4 @ primitive_use_field_array @ vd_field_array
+        @ type_decls5 @ primitive_use_field_array @ vd_field_array
     | _ -> fail ptype_loc "This type is not handled by @ppx_react_hook_form"
   else []
 
