@@ -10,7 +10,7 @@ type inputs = {cart: array<item>}
 
 @react.component
 let default = () => {
-  let {register, control, handleSubmit, formState: {errors}} = useFormOfInputs(
+  let {register, control, handleSubmit, formState: {errors, dirtyFields}} = useFormOfInputs(
     ~options={
       defaultValues: {
         cart: [{quantity: 1., price: 23.}],
@@ -19,6 +19,14 @@ let default = () => {
     },
   )
   let {fields, append, remove} = useFieldArrayOfInputsCart({name: Cart, control})
+
+  let isCartPriceFieldDirty = (index: int) =>
+    switch dirtyFields.cart->Option.flatMap(Belt.Array.get(_, index)) {
+    | Some({price}) => price
+    | _ => false
+    }
+
+  Js.log(isCartPriceFieldDirty(0))
 
   let onSubmit = (data: inputs) => Js.log(data)
 
@@ -40,7 +48,15 @@ let default = () => {
           | Some({quantity: ?Some({message})}) => message->React.string
           | _ => React.null
           }}
-          <input {...register((Cart, index, Price)->fieldArrayOfCart)} placeholder="price" />
+          <input
+            {...register(
+              (Cart, index, Price)->fieldArrayOfCart,
+              ~options={required: true, valueAsNumber: true},
+            )}
+            placeholder="price"
+            className={isCartPriceFieldDirty(index) ? "error" : ""}
+          />
+          <span> {(isCartPriceFieldDirty(index) ? "dirty" : "clean")->React.string} </span>
           {switch errors.cart->ReactHookForm.getFieldError(index) {
           | Some({price: ?Some({message})}) => message->React.string
           | _ => React.null

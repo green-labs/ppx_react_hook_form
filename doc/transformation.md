@@ -39,6 +39,12 @@ type rec valuesOfInputs =
   | Object(Js.Dict.t<valuesOfInputs>)
   | Array(array<valuesOfInputs>)
 
+type fieldDirtyOfInputs = {
+  example?: bool,
+  exampleRequired?: bool,
+  cart?: array<fieldDirtyOfItem>
+}
+
 type rec useFormReturnOfInputs<'setValueAs> = {
   control: controlOfInputs,
   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
@@ -52,8 +58,13 @@ type rec useFormReturnOfInputs<'setValueAs> = {
 } 
 and controlOfInputs
 and variantOfInputs = | @as("example") Example | @as("exampleRequired") ExampleRequired | @as("cart") Cart
-and registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs: 'setValueAs}
-and formStateOfInputs = {isDirty: bool, isValid: bool, errors: fieldErrorsOfInputs}
+and registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs?: 'setValueAs, valueAsNumber?: bool}
+and formStateOfInputs = {
+  isDirty: bool,
+  isValid: bool,
+  errors: fieldErrorsOfInputs,
+  dirtyFields: fieldDirtyOfInputs
+}
 and fieldErrorsOfInputs = {
   example?: fieldErrorOfInputs,
   exampleRequired?: fieldErrorOfInputs,

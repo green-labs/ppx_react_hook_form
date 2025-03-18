@@ -26,7 +26,7 @@ export default function App() {
     register,
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, dirtyFields }
   } = useForm<inputs>({
     defaultValues: {
       cart: [{ name: "test", quantity: 1, price: 23 }]
@@ -40,6 +40,12 @@ export default function App() {
   const onSubmit = (data: inputs) => console.log(data);
 
   console.log("!!", errors)
+
+  const isCartPriceFieldDirty = (index: number) =>
+    (dirtyFields.cart?.[index]?.price) ?
+      dirtyFields.cart?.[index]?.price
+      :
+      false
 
   return (
     <div>
@@ -73,10 +79,13 @@ export default function App() {
                   })}
                   className={errors?.cart?.[index]?.price ? "error" : ""}
                 />
-                <button type="button" onClick={() => remove(index)}>
-                  DELETE
-                </button>
+                <span>
+                  {(isCartPriceFieldDirty(index) ? "dirty" : "clean")}
+                </span>
               </section>
+              <button type="button" onClick={() => remove(index)}>
+                DELETE
+              </button>
             </div>
           );
         })}
