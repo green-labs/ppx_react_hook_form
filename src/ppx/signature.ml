@@ -539,9 +539,9 @@ let map_type_decl
                       ];
                     (* @module("react-hook-form") @react.component
                        external make: (
-                         ~name: variantOfInputs=?,
+                         ~name: variantOfInputs,
                          ~control: controlOfInputs=?,
-                         ~rules: controllerRulesOfInputs,
+                         ~rules: controllerRulesOfInputs=?,
                          ~render: controllerFieldsOfInputs => React.element=?,
                        ) => React.element = "Controller" *)
                     Sig.value
@@ -564,17 +564,17 @@ let map_type_decl
                                 (Typ.constr ~attrs:[ attr_named_arg ]
                                    (lid @@ "variantOf" ^ capitalize record_name)
                                    [])
-                                (Typ.arrow (Labelled "control")
+                                (Typ.arrow (Optional "control")
                                    (Typ.constr ~attrs:[ attr_named_arg ]
                                       (lid @@ "controlOf"
                                      ^ capitalize record_name)
                                       [])
-                                   (Typ.arrow (Labelled "rules")
+                                   (Typ.arrow (Optional "rules")
                                       (Typ.constr ~attrs:[ attr_named_arg ]
                                          (lid @@ "controllerRulesOf"
                                         ^ capitalize record_name)
                                          [])
-                                      (Typ.arrow (Labelled "render")
+                                      (Typ.arrow (Optional "render")
                                          (uncurried_core_type_arrow
                                             ~attrs:[ attr_named_arg ] ~arity:1
                                             [

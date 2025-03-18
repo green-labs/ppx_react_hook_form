@@ -1,6 +1,7 @@
 # v0.0.8 (unrelease)
 
 - Add `useWatch` hook
+- Updated Controller component type definition in react-hook-form: made name parameter required and rules parameter optional
 
 # v0.0.7
 

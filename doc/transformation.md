@@ -81,9 +81,9 @@ module ControllerOfInputs = {
 
   @module("react-hook-form") @react.component
   external make: (
-    ~name: variantOfInputs=?,
+    ~name: variantOfInputs,
     ~control: controlOfInputs=?,
-    ~rules: controllerRulesOfInputs,
+    ~rules: controllerRulesOfInputs=?,
     ~render: controllerFieldsOfInputs => React.element=?,
   ) => React.element = "Controller"
 }
