@@ -217,14 +217,22 @@ let map_type_decl
           Str.type_ Recursive
             [
               (* type useFormReturnOfInputs<'setValueAs> = {
+                  clearErrors: variantOfInputs => unit,
                   control: controlOfInputs,
                   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
                   handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
                   watch: variantOfInputs => valuesOfInputs,
                   getValues: variantOfInputs => option<valuesOfInputs>,
-                  reset: (~options: defaultValuesOfInputs=?) => unit,
                   formState: formStateOfInputs,
-                    } *)
+                  getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs,
+                  setValue: (variantOfInputs, ReactHookForm.value, ~options: setValueConfigOfInputs=?) => unit,
+                  reset: (~options: defaultValuesOfInputs=?) => unit,
+                  resetField: (variantOfInputs, ~options: resetFieldConfigOfInputs=?) => unit,
+                  setError: (variantOfInputs, fieldErrorOfInputs, ~options: setErrorConfigOfInputs=?) => unit,
+                  setFocus: variantOfInputs => unit,
+                  trigger: variantOfInputs => unit,
+                  unregister: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => unit,
+                  } *)
               Type.mk
                 (mkloc ("useFormReturnOf" ^ capitalize record_name) ptype_loc)
                 ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
@@ -232,6 +240,16 @@ let map_type_decl
                 ~kind:
                   (Ptype_record
                      [
+                       (* clearErrors: variantOfInputs => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "clearErrors")
+                         (uncurried_core_type_arrow ~arity:1
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf" ^ capitalize record_name)
+                                   [])
+                                (Typ.constr (lid "unit") []);
+                            ]);
                        (* control: controlOfInputs *)
                        Type.field ~mut:Immutable (mknoloc "control")
                          (Typ.constr
@@ -312,17 +330,6 @@ let map_type_decl
                                        [];
                                    ]);
                             ]);
-                       (* reset: (~options: defaultValuesOfInputs=?) => unit, *)
-                       Type.field ~mut:Immutable (mknoloc "reset")
-                         (uncurried_core_type_arrow ~arity:1
-                            [
-                              Typ.arrow (Optional "options")
-                                (Typ.constr ~attrs:[ attr_named_arg ]
-                                   (lid @@ "defaultValuesOf"
-                                  ^ capitalize record_name)
-                                   [])
-                                (Typ.constr (lid "unit") []);
-                            ]);
                        (* formState: formStateOfInputs, *)
                        Type.field ~mut:Immutable (mknoloc "formState")
                          (Typ.constr
@@ -367,6 +374,87 @@ let map_type_decl
                                          [])
                                       (Typ.constr (lid "unit") [])));
                             ]);
+                       (* reset: (~options: defaultValuesOfInputs=?) => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "reset")
+                         (uncurried_core_type_arrow ~arity:1
+                            [
+                              Typ.arrow (Optional "options")
+                                (Typ.constr ~attrs:[ attr_named_arg ]
+                                   (lid @@ "defaultValuesOf"
+                                  ^ capitalize record_name)
+                                   [])
+                                (Typ.constr (lid "unit") []);
+                            ]);
+                       (* resetField: (variantOfInputs, ~options: defaultValuesOfInputs=?) => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "resetField")
+                         (uncurried_core_type_arrow ~arity:2
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf" ^ capitalize record_name)
+                                   [])
+                                (Typ.arrow (Optional "options")
+                                   (Typ.constr ~attrs:[ attr_named_arg ]
+                                      (lid @@ "defaultValuesOf"
+                                     ^ capitalize record_name)
+                                      [])
+                                   (Typ.constr (lid "unit") []));
+                            ]);
+                       (* setError: (variantOfInputs, fieldErrorOfInputs, ~options: setErrorConfigOfInputs=?) => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "setError")
+                         (uncurried_core_type_arrow ~arity:3
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf" ^ capitalize record_name)
+                                   [])
+                                (Typ.arrow Nolabel
+                                   (Typ.constr
+                                      (lid @@ "fieldErrorOf"
+                                     ^ capitalize record_name)
+                                      [])
+                                   (Typ.arrow (Optional "options")
+                                      (Typ.constr
+                                         (lid @@ "setErrorConfigOf"
+                                        ^ capitalize record_name)
+                                         [])
+                                      (Typ.constr (lid "unit") [])));
+                            ]);
+                       (* setFocus: variantOfInputs => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "setFocus")
+                         (uncurried_core_type_arrow ~arity:1
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf" ^ capitalize record_name)
+                                   [])
+                                (Typ.constr (lid "unit") []);
+                            ]);
+                       (* trigger: variantOfInputs => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "trigger")
+                         (uncurried_core_type_arrow ~arity:1
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf" ^ capitalize record_name)
+                                   [])
+                                (Typ.constr (lid "unit") []);
+                            ]);
+                       (* unregister: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => unit, *)
+                       Type.field ~mut:Immutable (mknoloc "unregister")
+                         (uncurried_core_type_arrow ~arity:2
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr
+                                   (lid @@ "variantOf" ^ capitalize record_name)
+                                   [])
+                                (Typ.arrow (Optional "options")
+                                   (Typ.constr ~attrs:[ attr_named_arg ]
+                                      (lid @@ "registerOptionsOf"
+                                     ^ capitalize record_name)
+                                      [ Typ.var "setValueAs" ])
+                                   (Typ.constr (lid "unit") []));
+                            ]);
                      ]);
               (* type controlOfInputs *)
               Type.mk
@@ -377,7 +465,16 @@ let map_type_decl
                 (mkloc ("variantOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
                 ~kind:(Ptype_variant (make_const_decls fields ptype_loc));
-              (* type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs?: 'setValueAs, valueAsNumber?: bool} *)
+              (* type registerOptionsOfInputs<'setValueAs> = {
+                   required?: bool,
+                   setValueAs?: 'setValueAs,
+                   valueAsNumber?: bool,
+                   maxLength?: int,
+                   minLength?: int,
+                   max?: float,
+                   min?: float,
+                   pattern?: RegExp.t
+                 } *)
               Type.mk
                 (mkloc ("registerOptionsOf" ^ capitalize record_name) ptype_loc)
                 ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
@@ -393,6 +490,21 @@ let map_type_decl
                        Type.field ~attrs:[ attr_optional ] ~mut:Immutable
                          (mknoloc "valueAsNumber")
                          (Typ.constr (lid "bool") []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "maxLength")
+                         (Typ.constr (lid "int") []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "minLength")
+                         (Typ.constr (lid "int") []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "max")
+                         (Typ.constr (lid "float") []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "min")
+                         (Typ.constr (lid "float") []);
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "pattern")
+                         (Typ.constr (lid "RegExp.t") []);
                      ]);
               (* type formStateOfInputs = {
                   isDirty: bool,
@@ -511,6 +623,16 @@ let map_type_decl
                          (mknoloc "shouldTouch")
                          (Typ.constr (lid "bool") []);
                      ]);
+              Type.mk
+                (mkloc ("setErrorConfigOf" ^ capitalize record_name) ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     [
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "shouldFocus")
+                         (Typ.constr (lid "bool") []);
+                     ]);
             ]
         in
 
@@ -536,6 +658,31 @@ let map_type_decl
                       (Typ.constr ~attrs:[ attr_named_arg ]
                          (lid @@ "useFormParamsOf" ^ capitalize record_name)
                          [ Typ.var "resolver" ])
+                      (Typ.constr
+                         (lid @@ "useFormReturnOf" ^ capitalize record_name)
+                         [ Typ.var "setValueAs" ]);
+                  ]))
+        in
+        (* @module("react-hook-form")
+           external useFormContextOfInputs: unit => useFormReturnOfInputs<'setValueAs> = "useFormContext" *)
+        let primitive_use_form_context =
+          Str.primitive
+            (Val.mk
+               ~attrs:
+                 [
+                   Attr.mk (mknoloc "module")
+                     (PStr
+                        [
+                          Str.eval
+                          @@ Exp.constant (Const.string "react-hook-form");
+                        ]);
+                 ]
+               ~prim:[ "useFormContext" ]
+               (mknoloc @@ "useFormContextOf" ^ capitalize record_name)
+               (uncurried_core_type_arrow ~arity:0
+                  [
+                    Typ.arrow Nolabel
+                      (Typ.constr (lid "unit") [])
                       (Typ.constr
                          (lid @@ "useFormReturnOf" ^ capitalize record_name)
                          [ Typ.var "setValueAs" ]);
@@ -652,6 +799,62 @@ let map_type_decl
                                                (Longident.Ldot
                                                   (Lident "React", "element")))
                                             []))));
+                            ]));
+                  ]))
+        in
+
+        (* module FormProviderOfInputs = {
+             type props<'setValueAs> = {...useFormReturnOfInputs<'setValueAs>, children: React.element}
+             @module("react-hook-form")
+             external make: props<'setValueAs> => React.element = "FormProvider"
+           } *)
+        let module_form_provider =
+          Str.module_
+            (Mb.mk
+               (mknoloc @@ Some ("FormProviderOf" ^ capitalize record_name))
+               (Mod.structure
+                  [
+                    Str.type_ Recursive
+                      [
+                        (* type props<'setValueAs> = {...useFormReturnOfInputs<'setValueAs>, children: React.element} *)
+                        Type.mk (mkloc "props" ptype_loc) ~priv:Public
+                          ~params:
+                            [
+                              (Typ.var "setValueAs", (NoVariance, NoInjectivity));
+                            ]
+                          ~kind:
+                            (Ptype_record
+                               [
+                                 Type.field ~mut:Immutable (mknoloc "...")
+                                   (Typ.constr
+                                      (lid @@ "useFormReturnOf"
+                                     ^ capitalize record_name)
+                                      [ Typ.var "setValueAs" ]);
+                                 Type.field ~mut:Immutable (mknoloc "children")
+                                   (Typ.constr (lid "React.element") []);
+                               ]);
+                      ];
+                    (* @module("react-hook-form")
+                       external make: props<'setValueAs> => React.element = "FormProvider" *)
+                    Str.primitive
+                      (Val.mk
+                         ~attrs:
+                           [
+                             Attr.mk (mknoloc "module")
+                               (PStr
+                                  [
+                                    Str.eval
+                                    @@ Exp.constant
+                                         (Const.string "react-hook-form");
+                                  ]);
+                           ]
+                         ~prim:[ "FormProvider" ] (mknoloc "make")
+                         (uncurried_core_type_arrow ~arity:1
+                            [
+                              Typ.arrow Nolabel
+                                (Typ.constr (lid "props")
+                                   [ Typ.var "setValueAs" ])
+                                (Typ.constr (lid "React.element") []);
                             ]));
                   ]))
         in
@@ -1116,7 +1319,9 @@ let map_type_decl
           type_decls3;
           type_decls4;
           primitive_use_form;
+          primitive_use_form_context;
           module_controller;
+          module_form_provider;
           type_decls5;
           primitive_use_watch;
         ]
