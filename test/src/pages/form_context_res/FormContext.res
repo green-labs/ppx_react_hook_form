@@ -12,9 +12,9 @@ module PersonalInfo = {
     let {register, formState: {errors}} = useFormContextOfInputs()
 
     <div>
-      <h3> {"개인 정보"->React.string} </h3>
+      <h3> {"Personal Information"->React.string} </h3>
       <div>
-        <label htmlFor="firstName"> {"이름"->React.string} </label>
+        <label htmlFor="firstName"> {"First Name"->React.string} </label>
         <input
           {...register(
             FirstName,
@@ -25,12 +25,12 @@ module PersonalInfo = {
           id="firstName"
         />
         {switch errors.firstName {
-        | Some(_) => <p> {"이름을 입력해주세요"->React.string} </p>
+        | Some(_) => <p> {"Please enter your first name"->React.string} </p>
         | _ => React.null
         }}
       </div>
       <div>
-        <label htmlFor="lastName"> {"성"->React.string} </label>
+        <label htmlFor="lastName"> {"Last Name"->React.string} </label>
         <input
           {...register(
             LastName,
@@ -41,12 +41,12 @@ module PersonalInfo = {
           id="lastName"
         />
         {switch errors.lastName {
-        | Some(_) => <p> {"성을 입력해주세요"->React.string} </p>
+        | Some(_) => <p> {"Please enter your last name"->React.string} </p>
         | _ => React.null
         }}
       </div>
       <div>
-        <label htmlFor="age"> {"나이"->React.string} </label>
+        <label htmlFor="age"> {"Age"->React.string} </label>
         <input
           {...register(
             Age,
@@ -59,10 +59,7 @@ module PersonalInfo = {
           type_="number"
         />
         {switch errors.age {
-        | Some(_) =>
-          <p>
-            {"나이를 입력해주세요, 나이는 0보다 커야 합니다."->React.string}
-          </p>
+        | Some(_) => <p> {"Please enter your age, it must be greater than 0"->React.string} </p>
         | _ => React.null
         }}
       </div>
@@ -77,9 +74,9 @@ module ContactInfo = {
     let {register, formState: {errors}} = useFormContextOfInputs()
 
     <div>
-      <h3> {"연락처 정보"->React.string} </h3>
+      <h3> {"Contact Information"->React.string} </h3>
       <div>
-        <label htmlFor="email"> {"이메일"->React.string} </label>
+        <label htmlFor="email"> {"Email"->React.string} </label>
         <input
           {...register(
             Email,
@@ -91,7 +88,7 @@ module ContactInfo = {
           id="email"
         />
         {switch errors.email {
-        | Some(_) => <p> {"이메일을 입력해주세요"->React.string} </p>
+        | Some(_) => <p> {"Please enter your email"->React.string} </p>
         | _ => React.null
         }}
       </div>
@@ -116,10 +113,10 @@ let default = () => {
 
   <FormProviderOfInputs {...rhfSpread(methods)}>
     <form onSubmit={methods.handleSubmit(onSubmit)}>
-      <h2> {"프로필 정보"->React.string} </h2>
+      <h2> {"Profile Information"->React.string} </h2>
       <PersonalInfo />
       <ContactInfo />
-      <button type_="submit"> {"제출하기"->React.string} </button>
+      <button type_="submit"> {"Submit"->React.string} </button>
     </form>
   </FormProviderOfInputs>
 }

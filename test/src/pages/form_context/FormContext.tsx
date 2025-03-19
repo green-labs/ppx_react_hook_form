@@ -1,6 +1,5 @@
 import { useForm, FormProvider, useFormContext, SubmitHandler } from 'react-hook-form';
 
-// 폼 데이터 타입 정의
 interface FormInputs {
   firstName: string;
   lastName: string;
@@ -8,7 +7,6 @@ interface FormInputs {
   age: number;
 }
 
-// 최상위 폼 컴포넌트
 const FormContextExample = () => {
   const methods = useForm<FormInputs>({
     defaultValues: {
@@ -27,42 +25,41 @@ const FormContextExample = () => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)}>
-        <h2>프로필 정보</h2>
+        <h2>Profile Information</h2>
         <PersonalInfo />
         <ContactInfo />
-        <button type="submit">제출하기</button>
+        <button type="submit">Submit</button>
       </form>
     </FormProvider>
   );
 };
 
-// 개인 정보 입력 컴포넌트
 const PersonalInfo = () => {
   const { register, formState: { errors } } = useFormContext<FormInputs>();
 
   return (
     <div>
-      <h3>개인 정보</h3>
+      <h3>Personal Information</h3>
       <div>
-        <label htmlFor="firstName">이름: </label>
+        <label htmlFor="firstName">First Name: </label>
         <input
           id="firstName"
           {...register("firstName", { required: true })}
         />
-        {errors.firstName && <p>이름을 입력해주세요</p>}
+        {errors.firstName && <p>Please enter your first name</p>}
       </div>
 
       <div>
-        <label htmlFor="lastName">성: </label>
+        <label htmlFor="lastName">Last Name: </label>
         <input
           id="lastName"
           {...register("lastName", { required: true })}
         />
-        {errors.lastName && <p>성을 입력해주세요</p>}
+        {errors.lastName && <p>Please enter your last name</p>}
       </div>
 
       <div>
-        <label htmlFor="age">나이: </label>
+        <label htmlFor="age">Age: </label>
         <input
           id="age"
           type="number"
@@ -71,21 +68,20 @@ const PersonalInfo = () => {
             min: 0
           })}
         />
-        {errors.age && <p>나이를 입력해주세요, 나이는 0보다 커야 합니다.</p>}
+        {errors.age && <p>Please enter your age, it must be greater than 0</p>}
       </div>
     </div>
   );
 };
 
-// 연락처 정보 입력 컴포넌트
 const ContactInfo = () => {
   const { register, formState: { errors } } = useFormContext<FormInputs>();
 
   return (
     <div>
-      <h3>연락처 정보</h3>
+      <h3>Contact Information</h3>
       <div>
-        <label htmlFor="email">이메일: </label>
+        <label htmlFor="email">Email: </label>
         <input
           id="email"
           {...register("email", {
@@ -93,7 +89,7 @@ const ContactInfo = () => {
             pattern: /^\S+@\S+$/i
           })}
         />
-        {errors.email && <p>이메일을 입력해주세요</p>}
+        {errors.email && <p>Please enter your email</p>}
       </div>
     </div>
   );
