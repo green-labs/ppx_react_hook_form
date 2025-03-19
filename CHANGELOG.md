@@ -2,6 +2,9 @@
 
 - Add `dirtyFields` field to `formState`
 - Add `valueAsNumber` field to the option argument of `register`
+- Add new methods to useFormReturn: `clearErrors`, `resetField`, `setError`, `setFocus`, `trigger`, `unregister`
+- Expand validation options in `register`: `maxLength`, `minLength`, `max`, `min`, `pattern`
+- Add `useFormContext` hook and `FormProvider` module
 
 # v0.0.8
 

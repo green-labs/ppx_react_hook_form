@@ -46,6 +46,7 @@ type fieldDirtyOfInputs = {
 }
 
 type rec useFormReturnOfInputs<'setValueAs> = {
+  clearErrors: variantOfInputs => unit
   control: controlOfInputs,
   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
   handleSubmit: (inputs => unit) => JsxEvent.Form.t => unit,
@@ -54,11 +55,25 @@ type rec useFormReturnOfInputs<'setValueAs> = {
   formState: formStateOfInputs,
   getFieldState: (variantOfInputs, formStateOfInputs) => fieldStateOfInputs,
   setValue: (variantOfInputs, ReactHookForm.value, ~options: setValueConfigOfInputs=?) => unit,
-  reset: (~options:defaultValues=?) => unit
-} 
+  reset: (~options:defaultValues=?) => unit,
+  resetField: (variantOfInputs, ~options: defaultValues=?) => unit,
+  setError: (variantOfInputs, fieldErrorOfInputs, ~options: setErrorConfigOfInputs=?) => unit,
+  setFocus: variantOfInputs => unit,
+  trigger: variantOfInputs => unit,
+  unregister: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => unit,
+}
 and controlOfInputs
 and variantOfInputs = | @as("example") Example | @as("exampleRequired") ExampleRequired | @as("cart") Cart
-and registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs?: 'setValueAs, valueAsNumber?: bool}
+and registerOptionsOfInputs<'setValueAs> = {
+  required?: bool,
+  setValueAs?: 'setValueAs,
+  valueAsNumber?: bool,
+  maxLength?: int,
+  minLength?: int,
+  max?: float,
+  min?: float,
+  pattern?: RegExp.t
+}
 and formStateOfInputs = {
   isDirty: bool,
   isValid: bool,
@@ -80,11 +95,17 @@ and setValueConfigOfInputs = {
   shouldDirty: bool,
   shouldTouch: bool,
 }
+and setErrorConfigOfInputs = {
+  shouldFocus?: bool
+}
 
 @module("react-hook-form")
 external useFormOfInputs: (
   ~options: useFormParamsOfInputs<'resolver>=?
 ) => useFormReturnOfInputs<'setValueAs> = "useForm"
+
+@module("react-hook-form")
+external useFormContextOfInputs: unit => useFormReturnOfInputs<'setValueAs> = "useFormContext"
 
 module ControllerOfInputs = {
   type controllerRulesOfInputs = {required?: bool}
@@ -97,6 +118,12 @@ module ControllerOfInputs = {
     ~rules: controllerRulesOfInputs=?,
     ~render: controllerFieldsOfInputs => React.element=?,
   ) => React.element = "Controller"
+}
+
+module FormProviderOfInputs = {
+  type props<'setValueAs> = {...useFormReturnOfInputs<'setValueAs>, children: React.element}
+  @module("react-hook-form")
+  external make: props<'setValueAs> => React.element = "FormProvider"
 }
 
 //useWatch

@@ -12,6 +12,9 @@ import FieldArray from "../pages/field_array/FieldArray";
 import FieldArrayRes from "../pages/field_array_res/FieldArray.gen";
 import UseWatch from "../pages/use_watch/UseWatch";
 import UseWatchRes from "../pages/use_watch_res/UseWatch.gen";
+import FormContext from "../pages/form_context/FormContext";
+import FormContextRes from "../pages/form_context_res/FormContext.gen";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -57,6 +60,14 @@ const router = createBrowserRouter([
     path: "/use_watch_res",
     element: <UseWatchRes />
   },
+  {
+    path: "/form_context",
+    element: <FormContext />
+  },
+  {
+    path: "/form_context_res",
+    element: <FormContextRes />
+  }
 ])
 
 export default router
