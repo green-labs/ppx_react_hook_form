@@ -170,6 +170,52 @@ let map_type_decl
         let type_decls3 =
           Str.type_ Recursive
             [
+              (* type fieldDirtyOfInputs = { example: bool, exampleRequired: bool, cart?: array<fieldDirtyOfItem> } *)
+              Type.mk
+                (mkloc ("fieldDirtyOf" ^ capitalize record_name) ptype_loc)
+                ~priv:Public
+                ~kind:
+                  (Ptype_record
+                     (lds
+                     |> List.map
+                          (fun (({ pld_type } : label_declaration) as ld) ->
+                            match pld_type with
+                            (* type fieldDirtyOfInputs = {cart?: array<fieldDirtyOfItem>} *)
+                            | {
+                             ptyp_desc =
+                               Ptyp_constr
+                                 ( { txt = Lident "array" },
+                                   [
+                                     {
+                                       ptyp_desc =
+                                         Ptyp_constr ({ txt = Lident l }, []);
+                                     };
+                                   ] );
+                            } ->
+                                {
+                                  ld with
+                                  pld_type =
+                                    Typ.constr (lid "array")
+                                      [
+                                        Typ.constr
+                                          (lid @@ "fieldDirtyOf" ^ capitalize l)
+                                          [];
+                                      ];
+                                  pld_attributes =
+                                    add_optional_attribute ld.pld_attributes;
+                                }
+                            | _ ->
+                                {
+                                  ld with
+                                  pld_type = Typ.constr (lid "bool") [];
+                                  pld_attributes =
+                                    add_optional_attribute ld.pld_attributes;
+                                })));
+            ]
+        in
+        let type_decls4 =
+          Str.type_ Recursive
+            [
               (* type useFormReturnOfInputs<'setValueAs> = {
                   control: controlOfInputs,
                   register: (variantOfInputs, ~options: registerOptionsOfInputs<'setValueAs>=?) => JsxDOM.domProps,
@@ -331,7 +377,7 @@ let map_type_decl
                 (mkloc ("variantOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
                 ~kind:(Ptype_variant (make_const_decls fields ptype_loc));
-              (* type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs?: 'setValueAs} *)
+              (* type registerOptionsOfInputs<'setValueAs> = {required?: bool, setValueAs?: 'setValueAs, valueAsNumber?: bool} *)
               Type.mk
                 (mkloc ("registerOptionsOf" ^ capitalize record_name) ptype_loc)
                 ~params:[ (Typ.var "setValueAs", (NoVariance, NoInjectivity)) ]
@@ -344,8 +390,16 @@ let map_type_decl
                          (Typ.constr (lid "bool") []);
                        Type.field ~attrs:[ attr_optional ] ~mut:Immutable
                          (mknoloc "setValueAs") (Typ.var "setValueAs");
+                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
+                         (mknoloc "valueAsNumber")
+                         (Typ.constr (lid "bool") []);
                      ]);
-              (* type formStateOfInputs = {isDirty: bool, isValid: bool, errors: fieldErrorsOfInputs} *)
+              (* type formStateOfInputs = {
+                  isDirty: bool,
+                  isValid: bool,
+                  errors: fieldErrorsOfInputs,
+                  dirtyFields: fieldDirtyOfInputs,
+                  } *)
               Type.mk
                 (mkloc ("formStateOf" ^ capitalize record_name) ptype_loc)
                 ~priv:Public
@@ -359,6 +413,10 @@ let map_type_decl
                        Type.field ~mut:Immutable (mknoloc "errors")
                          (Typ.constr
                             (lid @@ "fieldErrorsOf" ^ capitalize record_name)
+                            []);
+                       Type.field ~mut:Immutable (mknoloc "dirtyFields")
+                         (Typ.constr
+                            (lid @@ "fieldDirtyOf" ^ capitalize record_name)
                             []);
                      ]);
               (* type fieldErrorsOfInputs = { example: fieldErrorOfInputs, exampleRequired: fieldErrorOfInputs } *)
@@ -605,7 +663,7 @@ let map_type_decl
              disabled: bool=?,
              exact: bool=?,
            } *)
-        let type_decls4 =
+        let type_decls5 =
           Str.type_ Recursive
             [
               Type.mk
@@ -669,7 +727,7 @@ let map_type_decl
                   ]))
         in
 
-        let type_decls5 =
+        let type_decls6 =
           lds
           |> List.filter_map
                (fun
@@ -1056,12 +1114,13 @@ let map_type_decl
           type_decls1;
           type_decls2;
           type_decls3;
+          type_decls4;
           primitive_use_form;
           module_controller;
-          type_decls4;
+          type_decls5;
           primitive_use_watch;
         ]
-        @ type_decls5 @ primitive_use_field_array @ vb_field_array
+        @ type_decls6 @ primitive_use_field_array @ vb_field_array
     | _ -> fail ptype_loc "This type is not handled by @ppx_react_hook_form"
   else []
 

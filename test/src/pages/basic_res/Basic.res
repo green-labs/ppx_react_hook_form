@@ -39,6 +39,8 @@ let default = () => {
 
   let exampleFieldState = getFieldState(Example, formState)
   Js.log(exampleFieldState)
+  let isExampleFieldDirty = formState.dirtyFields.exampleRequired
+  Js.log(isExampleFieldDirty)
   Js.log(setValue)
 
   <form onSubmit={handleSubmit(onSubmit)}>

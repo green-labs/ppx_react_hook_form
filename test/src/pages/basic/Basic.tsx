@@ -10,11 +10,13 @@ export default function Basic() {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<Inputs>()
   const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data)
 
   console.log(watch("example")) // watch input value by passing the name of it
+
+  console.log(dirtyFields) // { example: true, exampleRequired: true }
 
   return (
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
