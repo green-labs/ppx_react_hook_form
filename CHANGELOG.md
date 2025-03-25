@@ -1,4 +1,4 @@
-# v0.0.9(unreleased)
+# v0.0.9
 
 - Add `dirtyFields` field to `formState`
 - Add `valueAsNumber` field to the option argument of `register`
