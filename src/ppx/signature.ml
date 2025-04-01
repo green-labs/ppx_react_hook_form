@@ -862,7 +862,7 @@ let map_type_decl
 
         (* type useWatchParamsOfInputs = {
              name: variantOfInputs,
-             control: controlOfInputs=?,
+             control: controlOfInputs,
              defaultValue: valueOfInputs=?,
              disabled: bool=?,
              exact: bool=?,
@@ -880,8 +880,7 @@ let map_type_decl
                          (Typ.constr
                             (lid @@ "variantOf" ^ capitalize record_name)
                             []);
-                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
-                         (mknoloc "control")
+                       Type.field ~mut:Immutable (mknoloc "control")
                          (Typ.constr ~attrs:[ attr_named_arg ]
                             (lid @@ "controlOf" ^ capitalize record_name)
                             []);

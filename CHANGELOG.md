@@ -1,6 +1,6 @@
 # v0.0.10(unreleased)
 
-
+- Change control field from optional to required in useWatchParamsOfInputs type
 
 # v0.0.9
 

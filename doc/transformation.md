@@ -129,7 +129,7 @@ module FormProviderOfInputs = {
 //useWatch
 type useWatchParamsOfInputs = {
   name: variantOfInputs,
-  control: controlOfInputs=?,
+  control: controlOfInputs,
   defaultValue: valueOfInputs=?,
   disabled: bool=?,
   exact: bool=?,

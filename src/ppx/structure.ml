@@ -861,7 +861,7 @@ let map_type_decl
 
         (* type useWatchParamsOfInputs = {
              name: variantOfInputs,
-             control: controlOfInputs=?,
+             control: controlOfInputs,
              defaultValue: valuesOfInputs=?,
              disabled: bool=?,
              exact: bool=?,
@@ -879,8 +879,7 @@ let map_type_decl
                          (Typ.constr
                             (lid @@ "variantOf" ^ capitalize record_name)
                             []);
-                       Type.field ~attrs:[ attr_optional ] ~mut:Immutable
-                         (mknoloc "control")
+                       Type.field ~mut:Immutable (mknoloc "control")
                          (Typ.constr ~attrs:[ attr_named_arg ]
                             (lid @@ "controlOf" ^ capitalize record_name)
                             []);
@@ -1204,7 +1203,7 @@ let map_type_decl
                                                                                 .string
                                                                                 ~quotation_delimiter:
                                                                                 "*j"
-                                                                              "")
+                                                                                "")
                                                                              );
                                                                              ( Nolabel,
                                                                                Exp
@@ -1225,8 +1224,8 @@ let map_type_decl
                                                                                 (
                                                                                 Typ
                                                                                 .constr
-                                                                                
-                                                                               (lid
+                                                                                (
+                                                                                lid
                                                                                 "string")
                                                                                 [])
                                                                              );
@@ -1250,9 +1249,8 @@ let map_type_decl
                                                                      ~attrs:
                                                                        [
                                                                          Attr.mk
-                                                                           
-                                                                          (mknoloc
-                                                                             "res.uapp")
+                                                                           (mknoloc
+                                                                              "res.uapp")
                                                                            (PStr
                                                                               []);
                                                                        ]
@@ -1285,7 +1283,8 @@ let map_type_decl
                                                                  ]
                                                                (Const.string
                                                                   ~quotation_delimiter:
-                                                                    "*j" ".") );
+                                                                    "*j"
+                                                                  ".") );
                                                          ] );
                                                      ( Nolabel,
                                                        Exp.coerce
