@@ -3,23 +3,40 @@
 ```res
 @rhf
 type inputs = {
-  example?: string,
-  exampleRequired: string,
+  name: string,
+  age: float,
+  email: string,
 }
 
 @react.component
 let make = () => {
-  let {register, handleSubmit, watch, formState: {errors}} = useFormOfInputs()
+  let {register, handleSubmit, watch, formState: {errors}, getValues} = useFormOfInputs()
   let onSubmit = (data: inputs) => Js.log(data)
 
-  Js.log(watch(Example))
+  Js.log(watch(Name))
 
-  Js.log(getValues(Example))
+  Js.log(getValues(Name))
 
   <form onSubmit={handleSubmit(onSubmit)}>
-    <input {...register(Example)} defaultValue="test" />
-    <input {...register(ExampleRequired, ~options={required: true})} />
-    {errors.exampleRequired ? <span> {"This field is required"->React.string} </span> : React.null}
+    <input {...register(Name, ~options={required: true})} placeholder="Name" />
+    {switch errors.name {
+    | Some(_) => <span> {"Name is required"->React.string} </span>
+    | None => React.null
+    }}
+    <input
+      {...register(Age, ~options={required: true, min: 18.})} type_="number" placeholder="Age"
+    />
+    {switch errors.age {
+    | Some(_) => <span> {"Age must be at least 18"->React.string} </span>
+    | None => React.null
+    }}
+    <input
+      {...register(Email, ~options={required: true, pattern: /^\S+@\S+$/i})} placeholder="Email"
+    />
+    {switch errors.email {
+    | Some(_) => <span> {"Please enter a valid email"->React.string} </span>
+    | None => React.null
+    }}
     <input type_="submit" />
   </form>
 }
@@ -216,5 +233,131 @@ let default = () => {
     </button>
     <input type_="submit" />
   </form>
+}
+```
+
+### useFormContext
+
+```res
+@rhf
+type inputs = {
+  firstName: string,
+  lastName: string,
+  email: string,
+  age: float,
+}
+
+module PersonalInfo = {
+  @react.component
+  let make = () => {
+    let {register, formState: {errors}} = useFormContextOfInputs()
+
+    <div>
+      <h3> {"Personal Information"->React.string} </h3>
+      <div>
+        <label htmlFor="firstName"> {"First Name"->React.string} </label>
+        <input
+          {...register(
+            FirstName,
+            ~options={
+              required: true,
+            },
+          )}
+          id="firstName"
+        />
+        {switch errors.firstName {
+        | Some(_) => <p> {"Please enter your first name"->React.string} </p>
+        | _ => React.null
+        }}
+      </div>
+      <div>
+        <label htmlFor="lastName"> {"Last Name"->React.string} </label>
+        <input
+          {...register(
+            LastName,
+            ~options={
+              required: true,
+            },
+          )}
+          id="lastName"
+        />
+        {switch errors.lastName {
+        | Some(_) => <p> {"Please enter your last name"->React.string} </p>
+        | _ => React.null
+        }}
+      </div>
+      <div>
+        <label htmlFor="age"> {"Age"->React.string} </label>
+        <input
+          {...register(
+            Age,
+            ~options={
+              required: true,
+              min: 0.,
+            },
+          )}
+          id="age"
+          type_="number"
+        />
+        {switch errors.age {
+        | Some(_) => <p> {"Please enter your age, it must be greater than 0"->React.string} </p>
+        | _ => React.null
+        }}
+      </div>
+    </div>
+  }
+}
+
+module ContactInfo = {
+  @react.component
+  let make = () => {
+    let {register, formState: {errors}} = useFormContextOfInputs()
+
+    <div>
+      <h3> {"Contact Information"->React.string} </h3>
+      <div>
+        <label htmlFor="email"> {"Email"->React.string} </label>
+        <input
+          {...register(
+            Email,
+            ~options={
+              required: true,
+              pattern: /^\S+@\S+$/i,
+            },
+          )}
+          id="email"
+        />
+        {switch errors.email {
+        | Some(_) => <p> {"Please enter your email"->React.string} </p>
+        | _ => React.null
+        }}
+      </div>
+    </div>
+  }
+}
+
+@react.component
+let make = () => {
+  let methods = useFormOfInputs(
+    ~options={
+      defaultValues: {
+        firstName: "",
+        lastName: "",
+        email: "",
+        age: 0.,
+      },
+    },
+  )
+
+  let onSubmit = (data: inputs) => Js.log(data)
+
+  <FormProviderOfInputs {...rhfSpread(methods)}>
+    <form onSubmit={methods.handleSubmit(onSubmit)}>
+      <h2> {"Profile Information"->React.string} </h2>
+      <PersonalInfo />
+      <ContactInfo />
+      <button type_="submit"> {"Submit"->React.string} </button>
+    </form>
+  </FormProviderOfInputs>
 }
 ```
